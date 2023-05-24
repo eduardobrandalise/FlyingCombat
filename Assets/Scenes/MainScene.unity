@@ -8756,11 +8756,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 663dbeec202b5544596761a4512ee8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FORWARDSPEED: 0
-  LATERALSPEED: 20
-  ROLLSPEED: 0.5
-  ROTATIONMAXANGLE: 30
-  ROLLBACKSPEED: 10
+  forwardSpeed: 0
+  lateralSpeed: 10
+  rollSpeed: 20
+  rotationMaxAngle: 30
+  rollbackSpeed: 10
   rollbackAnimationCurve:
     serializedVersion: 2
     m_Curve:
@@ -8786,7 +8786,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   planeModelTransform: {fileID: 461155656}
-  propeller: {fileID: 1825864487}
+  propellerTransform: {fileID: 1825864487}
 --- !u!4 &2061786846
 Transform:
   m_ObjectHideFlags: 0
