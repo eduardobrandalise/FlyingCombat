@@ -1621,8 +1621,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0.14584428, y: -0.69190276, z: 0.14584428, w: 0.6919028}
-  m_LocalPosition: {x: 0.7700002, y: 14.95, z: 0}
+  m_LocalRotation: {x: 0.06146894, y: -0.14279407, z: 0.008885788, w: 0.98780185}
+  m_LocalPosition: {x: 0.7700002, y: 14.95, z: -8.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5712,8 +5712,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276319604}
-  m_LocalRotation: {x: 0.14584428, y: -0.69190276, z: 0.14584428, w: 0.6919028}
-  m_LocalPosition: {x: 0.7700002, y: 14.95, z: 0}
+  m_LocalRotation: {x: 0.06146894, y: -0.14279407, z: 0.008885788, w: 0.98780185}
+  m_LocalPosition: {x: 0.7700002, y: 14.95, z: -8.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7210,7 +7210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 1
-  m_FollowOffset: {x: 4.38, y: 2.55, z: 0}
+  m_FollowOffset: {x: 4.38, y: 2.55, z: -8.06}
   m_XDamping: 1
   m_YDamping: 1
   m_ZDamping: 1
@@ -8757,9 +8757,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FORWARDSPEED: 0
-  LATERALSPEED: 30
-  ROLLSPEED: 10
-  ROTATIONMAXANGLE: 0
+  LATERALSPEED: 20
+  ROLLSPEED: 0.5
+  ROTATIONMAXANGLE: 30
+  ROLLBACKSPEED: 10
   rollbackAnimationCurve:
     serializedVersion: 2
     m_Curve:
@@ -8784,7 +8785,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  planeModel: {fileID: 461155656}
+  planeModelTransform: {fileID: 461155656}
   propeller: {fileID: 1825864487}
 --- !u!4 &2061786846
 Transform:
