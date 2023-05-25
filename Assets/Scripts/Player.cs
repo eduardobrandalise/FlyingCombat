@@ -17,20 +17,43 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform propellerTransform;
 
     private Quaternion _currentRotationAngle;
+    private PlayerMesh _playerMesh;
     private float _rotationAngle;
     private float _current, _target;
     private float _propellerRotation = 0f;
-    private const float PropellerRotationSpeed = 2000f;
-    
+    private const float PropellerRotationSpeed = 4000f;
+
+    private void Start()
+    {
+        _playerMesh = planeModelTransform.GetComponent<PlayerMesh>();
+        
+        if (_playerMesh != null)
+        {
+            _playerMesh.collided.AddListener(PlayerMeshOnCollision);
+        }
+    }
+
     private void FixedUpdate()
     {
         Move();
-        
     }
 
     private void LateUpdate()
     {
         RotatePropeller();
+    }
+    
+    private void OnDestroy()
+    {
+        if (_playerMesh != null)
+        {
+            _playerMesh.collided.RemoveListener(PlayerMeshOnCollision);
+        }
+    }
+    
+    private void PlayerMeshOnCollision(Collider other)
+    {
+        // Debug.Log("Collision Event triggered by " + other.gameObject.name);
     }
 
     private void Move()
@@ -38,7 +61,6 @@ public class Player : MonoBehaviour
         // ----------------- FORWARD MOVEMENT -----------------
         var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
         var forwardMovement = Vector3.forward * forwardSpeed;
-        // transform.position += ((Vector3.forward + new Vector3(lateralInput, 0, 0)) * SPEED) * Time.deltaTime;
         transform.position += (forwardMovement) * Time.deltaTime;
         
         // ----------------- ROTATION MOVEMENT -----------------
@@ -48,7 +70,7 @@ public class Player : MonoBehaviour
         if (lateralInput > 0)
         {
             // Roll to the RIGHT.
-            var targetRotationRight = Quaternion.Euler(new Vector3(0, 0, rotationMaxAngle));
+            var targetRotationRight = Quaternion.Euler(new Vector3(0, 0, -rotationMaxAngle));
             var rollMovement = rollSpeed * Time.deltaTime;
             _currentRotationAngle = planeModelTransform.rotation;
             
@@ -65,7 +87,7 @@ public class Player : MonoBehaviour
         if (lateralInput < 0)
         {
             // Roll to the LEFT.
-            var targetRotationLeft = Quaternion.Euler(new Vector3(0, 0, -rotationMaxAngle));
+            var targetRotationLeft = Quaternion.Euler(new Vector3(0, 0, rotationMaxAngle));
             var rollMovement = rollSpeed * Time.deltaTime;
             _currentRotationAngle = planeModelTransform.rotation;
             
@@ -105,5 +127,10 @@ public class Player : MonoBehaviour
     {
         _propellerRotation = (_propellerRotation + (PropellerRotationSpeed * Time.deltaTime)) % 360f;
         propellerTransform.rotation = Quaternion.Euler(0, 0, _propellerRotation);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        print(collision.gameObject.name);
     }
 }

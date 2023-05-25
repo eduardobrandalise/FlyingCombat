@@ -521,7 +521,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89524024}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.5545311, y: 18.953999, z: 403.27277}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1189,7 +1189,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 64067786712459434, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
         type: 3}
+      propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 64067786712459434, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
+        type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 64067786712459434, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 64217860762290862, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
@@ -1197,9 +1207,19 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 64217860762290862, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 64470656777687694, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
         type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 64470656777687694, guid: 568fc47ce4a5fc94fa5a465b0ac82615,
+        type: 3}
+      propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -1666,7 +1686,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0.15086423, y: 1e-45, z: 0, w: 0.98855454}
+  m_LocalRotation: {x: 0.15086421, y: -0.000000019017136, z: 0.0000000029022227, w: 0.98855454}
   m_LocalPosition: {x: 2.5, y: 14.5, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2662,6 +2682,7 @@ MonoBehaviour:
   middleSpawnerPoint: {fileID: 408523538}
   rightSpawnerPoint: {fileID: 1309448257}
   rocket: {fileID: 5160458068927967891, guid: 0a4f231846e5ea84d9f7b50cebecc238, type: 3}
+  enemySpawningRate: 1
 --- !u!4 &584530266
 Transform:
   m_ObjectHideFlags: 0
@@ -5816,6 +5837,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1276319606}
+  - component: {fileID: 1276319608}
   - component: {fileID: 1276319605}
   - component: {fileID: 1276319607}
   m_Layer: 0
@@ -5870,7 +5892,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276319604}
-  m_LocalRotation: {x: 0.15086423, y: 1e-45, z: 0, w: 0.98855454}
+  m_LocalRotation: {x: 0.15086421, y: -0.000000019017136, z: 0.0000000029022227, w: 0.98855454}
   m_LocalPosition: {x: 2.5, y: 14.5, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5896,6 +5918,18 @@ MonoBehaviour:
   m_FocusTarget: {fileID: 0}
   m_FocusOffset: 0
   m_Profile: {fileID: 0}
+--- !u!114 &1276319608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1276319604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59dbfb6653d49fa418a960acb6ee2d16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1277628731
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7448,10 +7482,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_NoiseProfile: {fileID: 11400000, guid: a3dacaec0287d7444b4bd276816e1666, type: 2}
+  m_NoiseProfile: {fileID: 11400000, guid: e9ce97b7a206dc64d90931ea044e0c72, type: 2}
   m_PivotOffset: {x: 0, y: 0, z: 0}
-  m_AmplitudeGain: 0.6
-  m_FrequencyGain: 0.6
+  m_AmplitudeGain: 0
+  m_FrequencyGain: 5
   mNoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1001 &1670651442
 PrefabInstance:
@@ -8966,7 +9000,7 @@ MonoBehaviour:
   forwardSpeed: 0
   lateralSpeed: 5
   rollSpeed: 20
-  rotationMaxAngle: 30
+  rotationMaxAngle: 40
   rollbackSpeed: 10
   lanePosition: 10
   planeModelTransform: {fileID: 461155656}

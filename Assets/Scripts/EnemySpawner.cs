@@ -18,11 +18,11 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Transform middleSpawnerPoint;
     [SerializeField] private Transform rightSpawnerPoint;
     [SerializeField] private GameObject rocket;
-
-    private float _enemySpawningRate = 1f;
+    [SerializeField] private float enemySpawningRate = 1f;
+    
     private float _spawningTimer = 0f;
 
-    private void Start()
+    private void FixedUpdate()
     {
         ManageEnemySpawning();
     }
@@ -31,15 +31,14 @@ public class EnemySpawner : MonoBehaviour
     {
         _spawningTimer += Time.deltaTime;
         
-        if (_spawningTimer > _enemySpawningRate)
+        if (_spawningTimer > enemySpawningRate)
         {
             SpawnEnemy();
-
             _spawningTimer = 0f;
         }
     }
 
-    public void SpawnEnemy()
+    private void SpawnEnemy()
     {
         var chosenLane = PickRandomLane();
         
@@ -56,16 +55,16 @@ public class EnemySpawner : MonoBehaviour
                 break;
         }
     }
-    
-    public void InstantiateEnemy(Vector3 lanePosition)
+
+    private void InstantiateEnemy(Vector3 lanePosition)
     {
         GameObject instantiatedObject = Instantiate(rocket, transform.position, Quaternion.identity);
         instantiatedObject.transform.position = lanePosition;
         Rocket rocketComponent = instantiatedObject.GetComponent<Rocket>();
         instantiatedObject.GetComponent<Rocket>().enabled = true;
     }
-    
-    public Lane PickRandomLane()
+
+    private Lane PickRandomLane()
     {
         List<Lane> lanes = new List<Lane>(Enum.GetValues(typeof(Lane)).Cast<Lane>());
         int randomIndex = UnityEngine.Random.Range(0, lanes.Count);
