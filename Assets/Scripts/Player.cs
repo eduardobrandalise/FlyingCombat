@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float rollSpeed = 0.5f;
     [SerializeField] private float rotationMaxAngle = 30f;
     [SerializeField] private float rollbackSpeed = 10f;
-    [SerializeField] private float lanePosition = 5f;
+    [SerializeField] private float lanePosition = 10f;
     [SerializeField] private Transform planeModelTransform;
     [SerializeField] private Transform propellerTransform;
 
