@@ -39,7 +39,7 @@ public class Rocket : MonoBehaviour
     {
         print(other.gameObject.name);
         ParticleSystem instantiatedObject = Instantiate(explosionParticle, transform.position, Quaternion.identity);
-        CinemachineShake.Instance.ShakeCamera(2f, 0.5f);
+        CinemachineShake.Instance.ShakeCamera(1.5f, 0.4f);
         Destroy(gameObject);
     }
 

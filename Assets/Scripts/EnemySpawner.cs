@@ -1,16 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
-
-public enum Lane
-{
-    LeftLane,
-    MiddleLane,
-    RightLane
-}
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -44,13 +35,13 @@ public class EnemySpawner : MonoBehaviour
         
         switch (chosenLane)
         {
-            case Lane.LeftLane:
+            case Lane.Left:
                 InstantiateEnemy(leftSpawnerPoint.transform.position);
                 break;
-            case Lane.MiddleLane:
+            case Lane.Middle:
                 InstantiateEnemy(middleSpawnerPoint.transform.position);
                 break;
-            case Lane.RightLane:
+            case Lane.Right:
                 InstantiateEnemy(rightSpawnerPoint.transform.position);
                 break;
         }

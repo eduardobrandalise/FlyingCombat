@@ -5,6 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+internal enum MoveTo
+{
+    Left,
+    Right
+}
+
 public class Player : MonoBehaviour
 {
     [SerializeField] private float forwardSpeed = 30f;
@@ -18,8 +24,12 @@ public class Player : MonoBehaviour
 
     private Quaternion _currentRotationAngle;
     private PlayerMesh _playerMesh;
+    private Vector3 _currentPosition;
+    private Vector3 _targetPosition;
+    private Quaternion _targetRotation;
+    private Lane _currentLane;
+    private bool _canChangeLanes;
     private float _rotationAngle;
-    private float _current, _target;
     private float _propellerRotation = 0f;
     private const float PropellerRotationSpeed = 4000f;
 
@@ -31,6 +41,9 @@ public class Player : MonoBehaviour
         {
             _playerMesh.collided.AddListener(PlayerMeshOnCollision);
         }
+
+        _currentLane = Lane.Middle;
+        _canChangeLanes = true;
     }
 
     private void FixedUpdate()
@@ -58,15 +71,72 @@ public class Player : MonoBehaviour
 
     private void Move()
     {
-        // ----------------- FORWARD MOVEMENT -----------------
+        print(_canChangeLanes);
+        // print(_currentLane);
+        
+        const float tolerance = 0.1f;
+        if (_currentPosition.x != 0 || Math.Abs(_currentPosition.x - lanePosition) > tolerance || Math.Abs(_currentPosition.x - (-lanePosition)) > tolerance) return;
+        
         var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
+        
+        // ----------------- FORWARD MOVEMENT -----------------
+        MoveForward();
+
+        // ----------------- SIDEWAYS MOVEMENT -----------------
+        
+        if (_canChangeLanes && lateralInput != 0)
+        {
+           MoveTo moveTo = lateralInput > 0 ? MoveTo.Right : MoveTo.Left;
+           ChangeLane(moveTo);
+        }
+        
+        // ----------------- ROLLBACK MOVEMENT -----------------
+
+        if (lateralInput == 0)
+        {
+            // RollbackToCenterLane();
+        }
+        
+        print(_currentLane);
+    }
+
+    private void ChangeLane(MoveTo moveTo)
+    {
+        int targetLaneIndex;
+
+        switch (moveTo)
+        {
+            case MoveTo.Left:
+                if (_currentLane != Lane.Left)
+                {
+                    _currentPosition = transform.position;
+                    _targetPosition = new Vector3(lanePosition, _currentPosition.y, _currentPosition.z);
+            
+                    transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+
+                    targetLaneIndex = (int)_currentLane - 1;
+                    _currentLane = (Lane)targetLaneIndex;
+
+                }
+                break;
+            case MoveTo.Right:
+                if (_currentLane != Lane.Right)
+                {
+                    targetLaneIndex = (int)_currentLane + 1;
+                    _currentLane = (Lane)targetLaneIndex;
+                }
+                break;
+        }
+    }
+
+    private void MoveForward()
+    {
         var forwardMovement = Vector3.forward * forwardSpeed;
         transform.position += (forwardMovement) * Time.deltaTime;
-        
-        // ----------------- ROTATION MOVEMENT -----------------
+    }
 
-        Vector3 currentPosition;
-        Vector3 targetPosition;
+    private void MoveSidewaysHolding(float lateralInput)
+    {
         if (lateralInput > 0)
         {
             // Roll to the RIGHT.
@@ -77,10 +147,10 @@ public class Player : MonoBehaviour
             planeModelTransform.rotation = Quaternion.Slerp(_currentRotationAngle, targetRotationRight, rollMovement);
             
             // Move to the right lane.
-            currentPosition = transform.position;
-            targetPosition = new Vector3(lanePosition, currentPosition.y, currentPosition.z);
+            _currentPosition = transform.position;
+            _targetPosition = new Vector3(lanePosition, _currentPosition.y, _currentPosition.z);
             
-            transform.position = Vector3.Lerp(currentPosition, targetPosition, lateralSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
             return;
         }
         
@@ -94,33 +164,39 @@ public class Player : MonoBehaviour
             planeModelTransform.rotation = Quaternion.Slerp(_currentRotationAngle, targetRotationLeft, rollMovement);
             
             // Move to the left lane.
-            currentPosition = transform.position;
-            targetPosition = new Vector3(-lanePosition, currentPosition.y, currentPosition.z);
+            _currentPosition = transform.position;
+            _targetPosition = new Vector3(-lanePosition, _currentPosition.y, _currentPosition.z);
             
-            transform.position = Vector3.Lerp(currentPosition, targetPosition, lateralSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
             
             return;
         }
+    }
 
-        // ----------------- ROLLBACK MOVEMENT -----------------
-   
+    private void RollbackToCenterLane()
+    {
         // Back to stable position.
-        var targetRotation = Quaternion.identity;
+        _targetRotation = Quaternion.identity;
         var rollbackMovement = rollbackSpeed * Time.deltaTime;
+        var rotation = planeModelTransform.rotation;
         
-        _currentRotationAngle = new Quaternion(0, 0, planeModelTransform.rotation.z, 0);
-        planeModelTransform.rotation = Quaternion.Slerp(planeModelTransform.rotation, targetRotation, rollbackMovement);
-        if (Quaternion.Angle(planeModelTransform.rotation, targetRotation) < 0.3f)
+        rotation = Quaternion.Slerp(rotation, _targetRotation, rollbackMovement);
+        
+        _currentRotationAngle = new Quaternion(0, 0, rotation.z, 0);
+        
+        planeModelTransform.rotation = rotation;
+        
+        if (Quaternion.Angle(planeModelTransform.rotation, _targetRotation) < 1.5f)
         {
             // Stop the rotation and snap to the exact initial rotation
-            planeModelTransform.rotation = targetRotation;
+            planeModelTransform.rotation = _targetRotation;
         }
-        
+
         // Back to the middle lane
-        currentPosition = transform.position;
-        targetPosition = new Vector3(0, currentPosition.y, currentPosition.z);
-            
-        transform.position = Vector3.Lerp(currentPosition, targetPosition, lateralSpeed * Time.deltaTime);
+        _currentPosition = transform.position;
+        _targetPosition = new Vector3(0, _currentPosition.y, _currentPosition.z);
+
+        transform.position = Vector3.Lerp(_currentPosition, _targetPosition, rollbackMovement);
     }
 
     private void RotatePropeller()

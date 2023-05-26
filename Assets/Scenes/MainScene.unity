@@ -1686,7 +1686,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: 0.15086421, y: -0.000000019017136, z: 0.0000000029022227, w: 0.98855454}
+  m_LocalRotation: {x: 0.15086423, y: 1e-45, z: 0, w: 0.98855454}
   m_LocalPosition: {x: 2.5, y: 14.5, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2682,7 +2682,7 @@ MonoBehaviour:
   middleSpawnerPoint: {fileID: 408523538}
   rightSpawnerPoint: {fileID: 1309448257}
   rocket: {fileID: 5160458068927967891, guid: 0a4f231846e5ea84d9f7b50cebecc238, type: 3}
-  enemySpawningRate: 1
+  enemySpawningRate: 1000
 --- !u!4 &584530266
 Transform:
   m_ObjectHideFlags: 0
@@ -5892,7 +5892,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1276319604}
-  m_LocalRotation: {x: 0.15086421, y: -0.000000019017136, z: 0.0000000029022227, w: 0.98855454}
+  m_LocalRotation: {x: 0.15086423, y: 1e-45, z: 0, w: 0.98855454}
   m_LocalPosition: {x: 2.5, y: 14.5, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8998,7 +8998,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardSpeed: 0
-  lateralSpeed: 5
+  lateralSpeed: 10
   rollSpeed: 20
   rotationMaxAngle: 40
   rollbackSpeed: 10
