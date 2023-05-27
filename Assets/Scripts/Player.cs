@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Branda.Utils;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,12 +14,16 @@ internal enum MoveTo
 
 public class Player : MonoBehaviour
 {
+    private static Player instance;
+    public static Player Instance { get { return instance; }}
+    
     [SerializeField] private float forwardSpeed = 30f;
     [SerializeField] private float lateralSpeed = 60f;
     [SerializeField] private float rollSpeed = 0.5f;
     [SerializeField] private float rotationMaxAngle = 30f;
     [SerializeField] private float rollbackSpeed = 10f;
     [SerializeField] private float lanePosition = 10f;
+    [SerializeField] private float distanceBetweenLanes = 10f;
     [SerializeField] private Transform planeModelTransform;
     [SerializeField] private Transform propellerTransform;
 
@@ -32,6 +37,12 @@ public class Player : MonoBehaviour
     private float _rotationAngle;
     private float _propellerRotation = 0f;
     private const float PropellerRotationSpeed = 4000f;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this) { Destroy(gameObject); }
+        else { instance = this; }
+    }
 
     private void Start()
     {
@@ -48,7 +59,7 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
+        ManageMovement();
     }
 
     private void LateUpdate()
@@ -69,13 +80,16 @@ public class Player : MonoBehaviour
         // Debug.Log("Collision Event triggered by " + other.gameObject.name);
     }
 
-    private void Move()
+    private void ManageMovement()
     {
-        print(_canChangeLanes);
+        // print(_canChangeLanes);
         // print(_currentLane);
-        
+
+        _currentPosition = transform.position;
         const float tolerance = 0.1f;
-        if (_currentPosition.x != 0 || Math.Abs(_currentPosition.x - lanePosition) > tolerance || Math.Abs(_currentPosition.x - (-lanePosition)) > tolerance) return;
+        
+        //TODO: The purpose of the line below is to avoid movement when player is not in a lane. It's not reliable to check for equality between float numbers. Change logic.
+        // if (_currentPosition.x is not (0 or (-10 or 10))) return;
         
         var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
         
@@ -86,8 +100,8 @@ public class Player : MonoBehaviour
         
         if (_canChangeLanes && lateralInput != 0)
         {
-           MoveTo moveTo = lateralInput > 0 ? MoveTo.Right : MoveTo.Left;
-           ChangeLane(moveTo);
+           MoveTo side = lateralInput > 0 ? MoveTo.Right : MoveTo.Left;
+           MoveToSide(side);
         }
         
         // ----------------- ROLLBACK MOVEMENT -----------------
@@ -97,33 +111,47 @@ public class Player : MonoBehaviour
             // RollbackToCenterLane();
         }
         
-        print(_currentLane);
+        // print(_currentLane);
     }
 
-    private void ChangeLane(MoveTo moveTo)
+    private void MoveToSide(MoveTo side)
     {
         int targetLaneIndex;
-
-        switch (moveTo)
+        
+        print(side);
+        
+        switch (side)
         {
             case MoveTo.Left:
                 if (_currentLane != Lane.Left)
                 {
-                    _currentPosition = transform.position;
-                    _targetPosition = new Vector3(lanePosition, _currentPosition.y, _currentPosition.z);
+                    _targetPosition = new Vector3(_currentPosition.x - distanceBetweenLanes, _currentPosition.y, _currentPosition.z);
             
-                    transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+                    // transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+
+                    // transform.position = _targetPosition;
 
                     targetLaneIndex = (int)_currentLane - 1;
                     _currentLane = (Lane)targetLaneIndex;
 
+                    // _canChangeLanes = false;
                 }
                 break;
             case MoveTo.Right:
                 if (_currentLane != Lane.Right)
                 {
+                    _targetPosition = new Vector3(_currentPosition.x + distanceBetweenLanes, _currentPosition.y, _currentPosition.z);
+            
+                    // transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+                    transform.position = Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
+
+                    // transform.position = _targetPosition;
+                    
                     targetLaneIndex = (int)_currentLane + 1;
                     _currentLane = (Lane)targetLaneIndex;
+                    
+                    // _canChangeLanes = false;
                 }
                 break;
         }
@@ -208,5 +236,15 @@ public class Player : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         print(collision.gameObject.name);
+    }
+
+    public Vector3 GetPlayerPosition()
+    {
+        return transform.position;
+    }
+
+    public float GetDistanceBetweenLanes()
+    {
+        return distanceBetweenLanes;
     }
 }
