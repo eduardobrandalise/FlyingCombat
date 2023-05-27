@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
     private Quaternion _targetRotation;
     private Lane _currentLane;
     private bool _canChangeLanes;
+    private bool _isInputEnabled;
     private float _rotationAngle;
     private float _propellerRotation = 0f;
     private const float PropellerRotationSpeed = 4000f;
@@ -55,6 +56,7 @@ public class Player : MonoBehaviour
 
         _currentLane = Lane.Middle;
         _canChangeLanes = true;
+        _isInputEnabled = true;
     }
 
     private void FixedUpdate()
@@ -86,19 +88,21 @@ public class Player : MonoBehaviour
         // print(_currentLane);
 
         _currentPosition = transform.position;
+        UpdateCurrentLane();
+        print(_currentLane);
         const float tolerance = 0.1f;
         
-        //TODO: The purpose of the line below is to avoid movement when player is not in a lane. It's not reliable to check for equality between float numbers. Change logic.
+        //TODO: The purpose of the line below is to avoid movement when player is not in a lane. It's not reliable to check for equality between float numbers. Improve logic.
         // if (_currentPosition.x is not (0 or (-10 or 10))) return;
         
         var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
-        
+
         // ----------------- FORWARD MOVEMENT -----------------
-        MoveForward();
+        // MoveForward();
 
         // ----------------- SIDEWAYS MOVEMENT -----------------
         
-        if (_canChangeLanes && lateralInput != 0)
+        if (lateralInput != 0)
         {
            MoveTo side = lateralInput > 0 ? MoveTo.Right : MoveTo.Left;
            MoveToSide(side);
@@ -117,9 +121,7 @@ public class Player : MonoBehaviour
     private void MoveToSide(MoveTo side)
     {
         int targetLaneIndex;
-        
-        print(side);
-        
+
         switch (side)
         {
             case MoveTo.Left:
@@ -132,8 +134,8 @@ public class Player : MonoBehaviour
 
                     // transform.position = _targetPosition;
 
-                    targetLaneIndex = (int)_currentLane - 1;
-                    _currentLane = (Lane)targetLaneIndex;
+                    // targetLaneIndex = (int)_currentLane - 1;
+                    // _currentLane = (Lane)targetLaneIndex;
 
                     // _canChangeLanes = false;
                 }
@@ -148,10 +150,11 @@ public class Player : MonoBehaviour
 
                     // transform.position = _targetPosition;
                     
-                    targetLaneIndex = (int)_currentLane + 1;
-                    _currentLane = (Lane)targetLaneIndex;
+                    // targetLaneIndex = (int)_currentLane + 1;
+                    // _currentLane = (Lane)targetLaneIndex;
                     
                     // _canChangeLanes = false;
+                    // _isInputEnabled = false;
                 }
                 break;
         }
@@ -161,6 +164,31 @@ public class Player : MonoBehaviour
     {
         var forwardMovement = Vector3.forward * forwardSpeed;
         transform.position += (forwardMovement) * Time.deltaTime;
+    }
+
+    private void UpdateCurrentLane()
+    {
+        var tolerance = 0.1f;
+        var gameManager = GameManager.Instance;
+        
+        // TODO: adapt this code using GameManager as the source of the lanes' positions.
+        if (-10.5 - tolerance <= _currentPosition.x && _currentPosition.x <= -9.5f + tolerance)
+        {
+            _currentLane = Lane.Left;
+            return;
+        }
+        if (-0.5f <= _currentPosition.x && _currentPosition.x <= 0.5f)
+        {
+            _currentLane = Lane.Middle;
+            return;
+        }
+        if (9.5f <= _currentPosition.x && _currentPosition.x <= 10.5f)
+        {
+            _currentLane = Lane.Right;
+            return;
+        }
+
+        _currentLane = Lane.InBetween;
     }
 
     private void MoveSidewaysHolding(float lateralInput)

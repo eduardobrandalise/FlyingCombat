@@ -23,11 +23,6 @@ public class DebugManager : MonoBehaviour
         else { instance = this; }
     }
 
-    private void Start()
-    {
-        SetupDebugLanes();
-    }
-
     private void Update()
     {
         if (debug)
@@ -35,24 +30,12 @@ public class DebugManager : MonoBehaviour
             DrawLaneLines();
         }
     }
-
-    private void SetupDebugLanes()
+    
+    private static void DrawLaneLines()
     {
-        var distanceBetweenLanes = Player.Instance.GetDistanceBetweenLanes();
-        const float laneLength = 400f;
-
-        _middleLaneStartPoint = Player.Instance.GetPlayerPosition();
-        _middleLaneEndPoint = _middleLaneStartPoint + new Vector3(0, 0, laneLength);
-        _leftLaneStartPoint = _middleLaneStartPoint - new Vector3(distanceBetweenLanes, 0, 0);
-        _leftLaneEndPoint = _leftLaneStartPoint + new Vector3(0, 0, laneLength);
-        _rightLaneStartPoint = _middleLaneStartPoint + new Vector3(distanceBetweenLanes, 0, 0);
-        _rightLaneEndPoint = _rightLaneStartPoint + new Vector3(0, 0, laneLength);
-    }
-
-    public void DrawLaneLines()
-    {
-        Debug.DrawLine(_middleLaneStartPoint, _middleLaneEndPoint, Color.red);
-        Debug.DrawLine(_leftLaneStartPoint, _leftLaneEndPoint, Color.red);
-        Debug.DrawLine(_rightLaneStartPoint, _rightLaneEndPoint, Color.red);
+        var gameManager = GameManager.Instance;
+        Debug.DrawLine(gameManager.LeftLaneStartPoint, gameManager.LeftLaneEndPoint, Color.red);
+        Debug.DrawLine(gameManager.MiddleLaneStartPoint, gameManager.MiddleLaneEndPoint, Color.red);
+        Debug.DrawLine(gameManager.RightLaneStartPoint, gameManager.RightLaneEndPoint, Color.red);
     }
 }
