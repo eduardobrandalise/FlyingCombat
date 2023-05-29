@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 internal enum InputDirection
@@ -59,6 +60,7 @@ public class Player : MonoBehaviour
         _currentLane = Lane.Middle;
         _currentState = PlayerState.OnLane;
         _canMove = true;
+        _currentPosition = transform.position;
         _targetPosition = _currentPosition;
     }
 
@@ -80,187 +82,59 @@ public class Player : MonoBehaviour
         }
     }
     
-    private void PlayerMeshOnCollision(Collider other)
-    {
-        // Debug.Log("Collision Event triggered by " + other.gameObject.name);
-    }
 
     private void ManageMovement()
     {
+        var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
+        InputDirection inputDirection = InputDirection.Neutral;
+
         _currentPosition = transform.position;
         
-        var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
-
-        // ----------------- FORWARD MOVEMENT -----------------
-        // MoveForward();
-
-        // ----------------- SIDEWAYS MOVEMENT -----------------
-        if (!_currentLane.Equals(_targetLane))
+        switch (lateralInput)
         {
-            if (_targetLane == Lane.Left && _currentPosition.x < _gameManager.LeftLaneStartPoint.x)
+            case < 0:
+                inputDirection = InputDirection.Left;
+                break;
+            case > 0:
+                inputDirection = InputDirection.Right;
+                break;
+        }
+        
+        if (inputDirection == InputDirection.Left)
+        {
+            if (_currentPosition.x == _gameManager.RightLaneStartPoint.x)
+            {
+                _targetPosition = new Vector3(_gameManager.MiddleLaneStartPoint.x, _currentPosition.y,
+                    _currentPosition.z);
+            }
+            if (_currentPosition.x == _gameManager.MiddleLaneStartPoint.x)
             {
                 _targetPosition = new Vector3(_gameManager.LeftLaneStartPoint.x, _currentPosition.y,
                     _currentPosition.z);
-                gameObject.transform.position = _targetPosition;
-                _currentLane = _targetLane;
-                _canMove = true;
-                _targetPosition.x = 0;
             }
-            else if (_targetLane == Lane.Middle && (_currentPosition.x > _gameManager.MiddleLaneStartPoint.x || _currentPosition.x < _gameManager.MiddleLaneStartPoint.x))
+        }
+
+        if (inputDirection == InputDirection.Right)
+        {
+            if (_currentPosition.x == _gameManager.LeftLaneStartPoint.x)
             {
-                if (_currentLane == Lane.Left && _currentPosition.x > 0)
-                {
-                    _targetPosition = new Vector3(_gameManager.MiddleLaneStartPoint.x, _currentPosition.y,
-                        _currentPosition.z);
-                    gameObject.transform.position = _targetPosition;
-                    _currentLane = _targetLane;
-                    _canMove = true;
-                    _targetPosition.x = 0;
-                } else if (_currentLane == Lane.Right && _currentPosition.x < 0)
-                {
-                    _targetPosition = new Vector3(_gameManager.LeftLaneStartPoint.x, _currentPosition.y,
-                        _currentPosition.z);
-                    gameObject.transform.position = _targetPosition;
-                    _currentLane = _targetLane;
-                    _canMove = true;
-                    _targetPosition.x = 0;
-                }
+                _targetPosition = new Vector3(_gameManager.MiddleLaneStartPoint.x, _currentPosition.y,
+                    _currentPosition.z);
             }
-            else if (_targetLane == Lane.Right && _currentPosition.x > 2)
+            if (_currentPosition.x == _gameManager.MiddleLaneStartPoint.x)
             {
                 _targetPosition = new Vector3(_gameManager.RightLaneStartPoint.x, _currentPosition.y,
                     _currentPosition.z);
-                gameObject.transform.position = _targetPosition;
-                _currentLane = _targetLane;
-                _canMove = true;
-                _targetPosition.x = 0;
-            }
-            
-            CheckInputs();
-            
-            Move(_targetPosition);
-        }
-        
-        
-        // ----------------- SIDEWAYS MOVEMENT (OLD) -----------------
-        // InputDirection direction = InputDirection.Neutral;
-        //
-        // switch (lateralInput)
-        // {
-        //     case > 0:
-        //         direction = InputDirection.Right;
-        //         break;
-        //     case < 0:
-        //         direction = InputDirection.Left;
-        //         break;
-        //     case 0:
-        //         direction = InputDirection.Neutral;
-        //         break;
-        // }
-        //
-        // Move(direction);
-        
-        // ----------------- ROLLBACK MOVEMENT -----------------
-
-        if (lateralInput == 0)
-        {
-            // RollbackToCenterLane();
-        }
-        
-        // print(_currentLane);
-    }
-    
-    private void Move(Vector3 targetPosition)
-    {
-        transform.position = Vector3.MoveTowards(_currentPosition, targetPosition, lateralSpeed * Time.deltaTime);
-    }
-
-    private void CheckInputs()
-    {
-        if (!_canMove) return;
-
-        var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
-
-        switch (lateralInput)
-        {
-            case < 0 when _currentLane != Lane.Left:
-            {
-                var targetLaneIndex = (int)_currentLane - 1;
-                _targetLane = (Lane)targetLaneIndex;
-                _canMove = false;
-                _targetPosition.x -= distanceBetweenLanes * 2;
-                break;
-            }
-            case > 0 when _currentLane != Lane.Right:
-            {
-                var targetLaneIndex = (int)_currentLane + 1;
-                _targetLane = (Lane)targetLaneIndex;
-                _canMove = false;
-                _targetPosition.x += distanceBetweenLanes * 2;
-                break;
             }
         }
+        
+        Move();
     }
 
-    private void MoveSideways(InputDirection inputDirection)
+    private void Move()
     {
-        switch (inputDirection)
-        {
-            case InputDirection.Left:
-                if (_currentLane != Lane.Left)
-                {
-                    _inputManager.DisableLateralInput();
-                    _targetPosition = new Vector3(_currentPosition.x - distanceBetweenLanes, _currentPosition.y, _currentPosition.z);
-            
-                    // transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
-                    transform.position = Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
-
-                    if (_currentPosition.x <= _gameManager.LeftLaneStartPoint.x)
-                    {
-                        _currentPosition.x = _gameManager.LeftLaneStartPoint.x;
-                        _currentLane = Lane.Left;
-                        _targetLane = Lane.Left;
-                    }
-                    
-                    // transform.position = _targetPosition;
-
-                    // targetLaneIndex = (int)_currentLane - 1;
-                    // _currentLane = (Lane)targetLaneIndex;
-
-                    // _canChangeLanes = false;
-                }
-                break;
-            case InputDirection.Right:
-                if (_currentLane != Lane.Right)
-                {
-                    _inputManager.DisableLateralInput();
-                    _targetPosition = new Vector3(_currentPosition.x + distanceBetweenLanes, _currentPosition.y, _currentPosition.z);
-            
-                    // transform.position = Vector3.Lerp(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
-                    transform.position = Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
-
-                    if (_currentPosition.x >= _gameManager.RightLaneStartPoint.x)
-                    {
-                        _currentPosition.x = _gameManager.RightLaneStartPoint.x;
-                        _currentLane = Lane.Right;
-                    }
-
-                    // transform.position = _targetPosition;
-                    
-                    // targetLaneIndex = (int)_currentLane + 1;
-                    // _currentLane = (Lane)targetLaneIndex;
-                    
-                    // _canChangeLanes = false;
-                    // _isInputEnabled = false;
-                }
-                break;
-        }
-    }
-
-    private void MoveForward()
-    {
-        var forwardMovement = Vector3.forward * forwardSpeed;
-        transform.position += (forwardMovement) * Time.deltaTime;
+        transform.position =
+            Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
     }
 
     private void UpdateCurrentLane()
@@ -288,6 +162,11 @@ public class Player : MonoBehaviour
     {
         _propellerRotation = (_propellerRotation + (PropellerRotationSpeed * Time.deltaTime)) % 360f;
         propellerTransform.rotation = Quaternion.Euler(0, 0, _propellerRotation);
+    }
+
+    private void PlayerMeshOnCollision(Collider other)
+    {
+        // Debug.Log("Collision Event triggered by " + other.gameObject.name);
     }
 
     private void OnCollisionEnter(Collision collision)

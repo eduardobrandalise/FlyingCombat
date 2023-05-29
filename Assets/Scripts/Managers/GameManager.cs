@@ -35,7 +35,8 @@ public class GameManager : MonoBehaviour
     {
         var distanceBetweenLanes = Player.Instance.GetDistanceBetweenLanes();
         
-        MiddleLaneStartPoint = Player.Instance.GetPlayerPosition();
+        // MiddleLaneStartPoint = Player.Instance.GetPlayerPosition();
+        MiddleLaneStartPoint = new Vector3(0, 0, Player.Instance.GetPlayerPosition().z);
         MiddleLaneEndPoint = MiddleLaneStartPoint + new Vector3(0, 0, laneLenght);
         LeftLaneStartPoint = MiddleLaneStartPoint - new Vector3(distanceBetweenLanes, 0, 0);
         LeftLaneEndPoint = LeftLaneStartPoint + new Vector3(0, 0, laneLenght);
