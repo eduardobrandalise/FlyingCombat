@@ -513,6 +513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemySpawner: {fileID: 584530266}
+  laneLenght: 400
 --- !u!4 &89524026
 Transform:
   m_ObjectHideFlags: 0

@@ -16,7 +16,7 @@ public class InputManager : MonoBehaviour
         else { instance = this; }
         
         playerInputActions = new PlayerInputActions();
-        playerInputActions.Player.Enable();
+        EnableLateralInput();
     }
 
     public float GetLateralMovementNormalized()
@@ -26,5 +26,15 @@ public class InputManager : MonoBehaviour
         
         float xInputVector = inputVector.x;
         return xInputVector;
+    }
+
+    public void EnableLateralInput()
+    {
+        playerInputActions.Player.Enable();
+    }
+
+    public void DisableLateralInput()
+    {
+        playerInputActions.Player.Disable();
     }
 }
