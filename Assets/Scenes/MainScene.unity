@@ -9044,10 +9044,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardSpeed: 0
-  lateralSpeed: 10
-  rollSpeed: 20
+  lateralSpeed: 15
+  rotationSpeed: 120
   rotationMaxAngle: 40
-  rollbackSpeed: 10
+  rollbackSpeed: 1
   lanePosition: 10
   distanceBetweenLanes: 10
   planeModelTransform: {fileID: 461155656}
