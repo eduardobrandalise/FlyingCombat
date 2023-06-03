@@ -23,7 +23,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float lanePosition = 10f;
     [SerializeField] private float distanceBetweenLanes = 10f;
     [SerializeField] private Transform planeModelTransform;
-    [SerializeField] private Transform propellerTransform;
 
     private PlayerMesh _playerMesh;
     private Vector3 _currentPosition;
@@ -43,13 +42,13 @@ public class Player : MonoBehaviour
     [SerializeField] private float rotationSpeed = 0.5f;
     [SerializeField] private float rotationMaxAngle = 30f;
     [SerializeField] private float rollbackSpeed = 10f;
+    [SerializeField] private float _rotationTime = 0.65f; // Total time for both forward and backward rotation
     private Quaternion _currentRotationAngle;
     private float _rotationAngle;
     private Quaternion _rotationTarget;
     private Quaternion _initialRotation;
     private float forwardRotationProgress = 0.8f;
 
-    private float _rotationTime = 0.65f; // Total time for both forward and backward rotation
     private float _forwardRotationTime;
     private float _backwardRotationTime;
     private bool _isRotating = false;
@@ -77,8 +76,6 @@ public class Player : MonoBehaviour
         {
             _playerMesh.collided.AddListener(PlayerMeshOnCollision);
         }
-
-        
         
         InitializeVariables();
     }
@@ -88,11 +85,6 @@ public class Player : MonoBehaviour
         ManageMovement();
     }
 
-    private void LateUpdate()
-    {
-        RotatePropeller();
-    }
-
     private void OnDestroy()
     {
         if (_playerMesh != null)
@@ -100,7 +92,6 @@ public class Player : MonoBehaviour
             _playerMesh.collided.RemoveListener(PlayerMeshOnCollision);
         }
     }
-
 
     private void ManageMovement()
     {
@@ -123,11 +114,6 @@ public class Player : MonoBehaviour
                     _currentPosition.z);
                 StartRotation();
             }
-
-            // var rotationGoal = new Vector3(0, 0, rotationMaxAngle);
-            // _rotationTarget = Quaternion.Euler(rotationGoal);
-            // _currentRotationAngle = transform.rotation;
-            
         }
 
         if (_inputDirection == InputDirection.Right)
@@ -145,10 +131,6 @@ public class Player : MonoBehaviour
                     _currentPosition.z);
                 StartRotation();
             }
-
-            // var rotationGoal = new Vector3(0, 0, -rotationMaxAngle);
-            // _rotationTarget = Quaternion.Euler(rotationGoal);
-            // _currentRotationAngle = transform.rotation;
         }
         
         Move();
@@ -158,16 +140,25 @@ public class Player : MonoBehaviour
     {
         var lateralInput = InputManager.Instance.GetLateralMovementNormalized();
 
-        _inputDirection = lateralInput switch
+        if (lateralInput < 0)
         {
-            < 0 => InputDirection.Left,
-            > 0 => InputDirection.Right,
-            _ => InputDirection.None
-        };
+            _inputDirection = InputDirection.Left;
+        }
+        else if (lateralInput > 0)
+        {
+            _inputDirection = InputDirection.Right;
+        }
+        else
+        {
+            _inputDirection = InputDirection.None;
+        }
     }
 
     private void Move()
     {
+        var forwardMovement = Vector3.forward * (forwardSpeed * Time.deltaTime);
+        _targetPosition = forwardMovement + _targetPosition;
+        
         transform.position =
             Vector3.MoveTowards(_currentPosition, _targetPosition, lateralSpeed * Time.deltaTime);
 
@@ -175,7 +166,7 @@ public class Player : MonoBehaviour
         // Regressive progress from 1 to 0.
         var progress = (1f - (1f - difference)) / distanceBetweenLanes;
 
-        if (progress < 0.05f)
+        if (progress < 0.01f)
         {
             // Snap to lane.
             transform.position = _targetPosition;
@@ -270,77 +261,6 @@ public class Player : MonoBehaviour
 
         _initialRotation = transform.rotation;
         _rotationTarget = Quaternion.Euler(0, 0, rotationMaxAngle);
-    }
-
-    private void Rotate3()
-    {
-        float step = rotationSpeed * Time.deltaTime;
-        _currentRotationAngle = Quaternion.RotateTowards(_currentRotationAngle, _rotationTarget, step);
-
-        planeModelTransform.rotation = _currentRotationAngle;
-    }
-
-private void Rotate2()
-    {
-        float rollMovement = rotationSpeed * Time.deltaTime;
-        planeModelTransform.rotation = Quaternion.Slerp(_currentRotationAngle, _rotationTarget, rollMovement);
-    }
-    
-    private void Rotate(float movementProgress)
-    {
-        float direction = _targetPosition.x - _currentPosition.x;
-        Vector3 rotationGoal;
-        Quaternion targetRotationLeft;
-        float rollMovement;
-
-        switch (direction)
-        {
-            case > 0:
-                _rotationAngle = rotationMaxAngle;
-                rotationGoal = new Vector3(0, 0, _rotationAngle);
-                planeModelTransform.rotation = Quaternion.Lerp(Quaternion.Euler(rotationGoal), Quaternion.Euler(Vector3.zero), rotationSpeed * Time.deltaTime);
-                targetRotationLeft = Quaternion.Euler(new Vector3(0, 0, rotationMaxAngle));
-                rollMovement = rotationSpeed * Time.deltaTime;
-                _currentRotationAngle = planeModelTransform.rotation;
-        
-                planeModelTransform.rotation = Quaternion.Slerp(_currentRotationAngle, targetRotationLeft, rollMovement);
-                break;
-            case < 0:
-                _rotationAngle = -rotationMaxAngle;
-                rotationGoal = new Vector3(0, 0, _rotationAngle);
-                planeModelTransform.rotation = Quaternion.Lerp(Quaternion.Euler(rotationGoal), Quaternion.Euler(Vector3.zero), rotationSpeed * Time.deltaTime);
-                targetRotationLeft = Quaternion.Euler(new Vector3(0, 0, rotationMaxAngle));
-                rollMovement = rotationSpeed * Time.deltaTime;
-                _currentRotationAngle = planeModelTransform.rotation;
-        
-                planeModelTransform.rotation = Quaternion.Slerp(_currentRotationAngle, targetRotationLeft, rollMovement);
-                break;
-        }
-    }
-
-    private void UpdateCurrentLane()
-    {
-        if (_gameManager.LeftLaneStartPoint.x - _lanePositionTolerance <= _currentPosition.x && _currentPosition.x <= _gameManager.LeftLaneStartPoint.x + _lanePositionTolerance)
-        {
-            _currentLane = Lane.Left;
-            return;
-        }
-        if (_gameManager.MiddleLaneStartPoint.x - _lanePositionTolerance <= _currentPosition.x && _currentPosition.x <= _gameManager.MiddleLaneStartPoint.x + _lanePositionTolerance)
-        {
-            _currentLane = Lane.Middle;
-            return;
-        }
-        if (_gameManager.RightLaneStartPoint.x - _lanePositionTolerance <= _currentPosition.x && _currentPosition.x <= _gameManager.RightLaneStartPoint.x + _lanePositionTolerance)
-        {
-            _currentLane = Lane.Right;
-            return;
-        }
-    }
-
-    private void RotatePropeller()
-    {
-        _propellerRotation = (_propellerRotation + (PropellerRotationSpeed * Time.deltaTime)) % 360f;
-        propellerTransform.rotation = Quaternion.Euler(0, 0, _propellerRotation);
     }
 
     private void PlayerMeshOnCollision(Collider other)
