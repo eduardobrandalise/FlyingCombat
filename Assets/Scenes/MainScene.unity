@@ -658,7 +658,7 @@ GameObject:
   - component: {fileID: 457690155}
   - component: {fileID: 457690154}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -929,7 +929,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh28190
+  m_Name: pb_Mesh28186
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1670,7 +1670,7 @@ GameObject:
   - component: {fileID: 1776419454}
   - component: {fileID: 1776419453}
   m_Layer: 0
-  m_Name: Trail
+  m_Name: TrailParticleSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6524,6 +6524,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2061786846}
   - component: {fileID: 2061786845}
+  - component: {fileID: 2061786847}
+  - component: {fileID: 2061786848}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -6543,15 +6545,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 663dbeec202b5544596761a4512ee8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardSpeed: 20
-  lateralSpeed: 30
-  lanePosition: 10
-  distanceBetweenLanes: 10
   planeModelTransform: {fileID: 457690153}
-  rotationSpeed: 120
-  rotationMaxAngle: 40
-  rollbackSpeed: 1
-  _rotationTime: 0.3
 --- !u!4 &2061786846
 Transform:
   m_ObjectHideFlags: 0
@@ -6570,3 +6564,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2061786847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061786844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a320fbae71cfa0e40a34920325c15354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2061786848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061786844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cd93a20da388348bb23888abd561a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ForwardSpeed>k__BackingField: 30
+  <LateralSpeed>k__BackingField: 60
+  <RotationSpeed>k__BackingField: 0.5
+  <RotationMaxAngle>k__BackingField: 30
+  <RollbackSpeed>k__BackingField: 10
+  <RotationTime>k__BackingField: 0.65
+  <LaneSnappingTolerance>k__BackingField: 0.1

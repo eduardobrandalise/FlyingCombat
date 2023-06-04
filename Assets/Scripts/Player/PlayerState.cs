@@ -1,5 +1,8 @@
-enum PlayerState
+public enum PlayerState
 {
-    OnLane,
-    Moving
+    Idle,
+    Dashing,
+    Returning,
+    Hit,
+    Destroyed
 }

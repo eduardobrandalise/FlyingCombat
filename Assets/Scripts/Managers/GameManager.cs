@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform enemySpawner;
     [SerializeField] private float laneLenght = 400f;
+    [SerializeField] public float DistanceBetweenLanes { get; private set; } = 10f;
 
     public Vector3 MiddleLaneStartPoint { get; private set; }
     public Vector3 MiddleLaneEndPoint { get; private set; }
@@ -19,7 +20,8 @@ public class GameManager : MonoBehaviour
     public Vector3 LeftLaneEndPoint { get; private set; }
     public Vector3 RightLaneStartPoint { get; private set; }
     public Vector3 RightLaneEndPoint { get; private set; }
-    
+
+
     private void Awake()
     {
         if (instance != null && instance != this) { Destroy(gameObject); }
@@ -33,14 +35,12 @@ public class GameManager : MonoBehaviour
 
     private void SetupLanePositions()
     {
-        var distanceBetweenLanes = Player.Instance.GetDistanceBetweenLanes();
-        
         // MiddleLaneStartPoint = Player.Instance.GetPlayerPosition();
-        MiddleLaneStartPoint = new Vector3(0, 0, Player.Instance.GetPlayerPosition().z);
+        MiddleLaneStartPoint = new Vector3(Player.Instance.GetPlayerPosition().x, Player.Instance.GetPlayerPosition().y, 0);
         MiddleLaneEndPoint = MiddleLaneStartPoint + new Vector3(0, 0, laneLenght);
-        LeftLaneStartPoint = MiddleLaneStartPoint - new Vector3(distanceBetweenLanes, 0, 0);
+        LeftLaneStartPoint = MiddleLaneStartPoint - new Vector3(DistanceBetweenLanes, 0, 0);
         LeftLaneEndPoint = LeftLaneStartPoint + new Vector3(0, 0, laneLenght);
-        RightLaneStartPoint = MiddleLaneStartPoint + new Vector3(distanceBetweenLanes, 0, 0);
+        RightLaneStartPoint = MiddleLaneStartPoint + new Vector3(DistanceBetweenLanes, 0, 0);
         RightLaneEndPoint = RightLaneStartPoint + new Vector3(0, 0, laneLenght);
     }
 }
