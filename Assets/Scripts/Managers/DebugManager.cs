@@ -34,8 +34,8 @@ public class DebugManager : MonoBehaviour
     private static void DrawLaneLines()
     {
         var gameManager = GameManager.Instance;
-        Debug.DrawLine(gameManager.LeftLaneStartPoint, gameManager.LeftLaneEndPoint, Color.red);
-        Debug.DrawLine(gameManager.MiddleLaneStartPoint, gameManager.MiddleLaneEndPoint, Color.red);
-        Debug.DrawLine(gameManager.RightLaneStartPoint, gameManager.RightLaneEndPoint, Color.red);
+        Debug.DrawLine(gameManager.LeftLaneStartPosition, gameManager.LeftLaneEndPosition, Color.red);
+        Debug.DrawLine(gameManager.MiddleLaneStartPosition, gameManager.MiddleLaneEndPosition, Color.red);
+        Debug.DrawLine(gameManager.RightLaneStartPosition, gameManager.RightLaneEndPosition, Color.red);
     }
 }

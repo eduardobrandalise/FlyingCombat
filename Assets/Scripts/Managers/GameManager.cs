@@ -14,12 +14,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float laneLenght = 400f;
     [SerializeField] public float DistanceBetweenLanes { get; private set; } = 10f;
 
-    public Vector3 MiddleLaneStartPoint { get; private set; }
-    public Vector3 MiddleLaneEndPoint { get; private set; }
-    public Vector3 LeftLaneStartPoint { get; private set; }
-    public Vector3 LeftLaneEndPoint { get; private set; }
-    public Vector3 RightLaneStartPoint { get; private set; }
-    public Vector3 RightLaneEndPoint { get; private set; }
+    public Vector3 MiddleLaneStartPosition { get; private set; }
+    public Vector3 MiddleLaneEndPosition { get; private set; }
+    public Vector3 LeftLaneStartPosition { get; private set; }
+    public Vector3 LeftLaneEndPosition { get; private set; }
+    public Vector3 RightLaneStartPosition { get; private set; }
+    public Vector3 RightLaneEndPosition { get; private set; }
+
+    private bool _isGamePaused = false;
 
 
     private void Awake()
@@ -36,22 +38,50 @@ public class GameManager : MonoBehaviour
     private void SetupLanePositions()
     {
         // MiddleLaneStartPoint = Player.Instance.GetPlayerPosition();
-        MiddleLaneStartPoint = new Vector3(Player.Instance.GetPlayerPosition().x, Player.Instance.GetPlayerPosition().y, 0);
-        MiddleLaneEndPoint = MiddleLaneStartPoint + new Vector3(0, 0, laneLenght);
-        LeftLaneStartPoint = MiddleLaneStartPoint - new Vector3(DistanceBetweenLanes, 0, 0);
-        LeftLaneEndPoint = LeftLaneStartPoint + new Vector3(0, 0, laneLenght);
-        RightLaneStartPoint = MiddleLaneStartPoint + new Vector3(DistanceBetweenLanes, 0, 0);
-        RightLaneEndPoint = RightLaneStartPoint + new Vector3(0, 0, laneLenght);
+        MiddleLaneStartPosition = new Vector3(Player.Instance.GetPlayerPosition().x, Player.Instance.GetPlayerPosition().y, 0);
+        MiddleLaneEndPosition = MiddleLaneStartPosition + new Vector3(0, 0, laneLenght);
+        LeftLaneStartPosition = MiddleLaneStartPosition - new Vector3(DistanceBetweenLanes, 0, 0);
+        LeftLaneEndPosition = LeftLaneStartPosition + new Vector3(0, 0, laneLenght);
+        RightLaneStartPosition = MiddleLaneStartPosition + new Vector3(DistanceBetweenLanes, 0, 0);
+        RightLaneEndPosition = RightLaneStartPosition + new Vector3(0, 0, laneLenght);
     }
 
-    public Vector3 GetLanePosition(Lane lane)
+    public Vector3 GetLaneStartPosition(Lane lane)
     {
         return lane switch
         {
-            Lane.Left => LeftLaneStartPoint,
-            Lane.Middle => MiddleLaneStartPoint,
-            Lane.Right => RightLaneStartPoint,
-            _ => MiddleLaneStartPoint
+            Lane.Left => LeftLaneStartPosition,
+            Lane.Middle => MiddleLaneStartPosition,
+            Lane.Right => RightLaneStartPosition,
+            _ => MiddleLaneStartPosition
         };
+    }
+    
+    /// <summary>
+    /// Sets the scale at which time passes for the specified duration in seconds.
+    /// The scale goes from 0 (paused) to 1 (normal).
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <param name="timeScale"></param>
+    public void SetTimeScale(float timeScale, float duration)
+    {
+        if (_isGamePaused)
+        {
+            print("Game is already paused.");
+            return;
+        }
+
+        StartCoroutine(PauseCoroutine(duration, timeScale));
+    }
+    
+    private IEnumerator PauseCoroutine(float duration, float timeScale)
+    {
+        _isGamePaused = true;
+        Time.timeScale = timeScale; // Set the time scale to 0 to pause the game
+
+        yield return new WaitForSecondsRealtime(duration); // Wait for the specified duration in real time
+
+        Time.timeScale = 1f; // Set the time scale back to 1 to resume the game
+        _isGamePaused = false;
     }
 }

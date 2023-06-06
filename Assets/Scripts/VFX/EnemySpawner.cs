@@ -2,20 +2,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private Transform leftSpawnerPoint;
-    [SerializeField] private Transform middleSpawnerPoint;
-    [SerializeField] private Transform rightSpawnerPoint;
-    [SerializeField] private GameObject rocket;
+    [SerializeField] private Transform leftSpawner;
+    [SerializeField] private Transform middleSpawner;
+    [SerializeField] private Transform rightSpawner;
+    [SerializeField] private GameObject enemyShipPrefab;
     [SerializeField] private float enemySpawningRate = 1f;
-    
+    [SerializeField] private float distanceFromPlayer = 400f;
+
+    private Player _player;
     private float _spawningTimer = 0f;
+
+    private void Start()
+    {
+        _player = Player.Instance;
+    }
 
     private void FixedUpdate()
     {
         ManageEnemySpawning();
+    }
+
+    private void LateUpdate()
+    {
+        Move();
+    }
+
+    private void Move()
+    {
+        // var currentPosition = transform.position;
+        var newPosition = new Vector3(GameManager.Instance.GetLaneStartPosition(Lane.Middle).x, 
+            _player.GetPlayerPosition().y, _player.GetPlayerPosition().z + distanceFromPlayer);
+
+        transform.position = newPosition;
     }
 
     private void ManageEnemySpawning()
@@ -31,28 +54,24 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        var chosenLane = PickRandomLane();
-        
-        switch (chosenLane)
-        {
-            case Lane.Left:
-                InstantiateEnemy(leftSpawnerPoint.transform.position);
-                break;
-            case Lane.Middle:
-                InstantiateEnemy(middleSpawnerPoint.transform.position);
-                break;
-            case Lane.Right:
-                InstantiateEnemy(rightSpawnerPoint.transform.position);
-                break;
-        }
+        InstantiateEnemy(PickRandomLane());
     }
 
-    private void InstantiateEnemy(Vector3 lanePosition)
+    private void InstantiateEnemy(Lane lane)
     {
-        GameObject instantiatedObject = Instantiate(rocket, transform.position, Quaternion.identity);
-        instantiatedObject.transform.position = lanePosition;
-        Rocket rocketComponent = instantiatedObject.GetComponent<Rocket>();
-        instantiatedObject.GetComponent<Rocket>().enabled = true;
+        Vector3 spawnerPosition = lane switch
+        {
+            Lane.Left => leftSpawner.transform.position,
+            Lane.Middle => middleSpawner.transform.position,
+            Lane.Right => rightSpawner.transform.position,
+            _ => middleSpawner.transform.position
+        };
+
+        Instantiate(enemyShipPrefab, spawnerPosition, Quaternion.identity);
+        // GameObject instantiatedObject = GameObject instantiatedObject = Instantiate(enemyShipPrefab, spawnerPosition, Quaternion.identity);
+        // instantiatedObject.transform.position = spawner.transform.position;
+        // Rocket rocketComponent = instantiatedObject.GetComponent<Rocket>();
+        // instantiatedObject.GetComponent<Enemy>().enabled = true;
     }
 
     private Lane PickRandomLane()

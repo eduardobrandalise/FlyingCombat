@@ -1,4 +1,5 @@
 using System;
+using Branda.Utils;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -97,7 +98,7 @@ public class Player : MonoBehaviour
                 var tolerance = _playerData.LaneSnappingTolerance;
                 var currentPosition = transform.position;
                 
-                if (_gameManager.GetLanePosition(CurrentLane).x - tolerance <= currentPosition.x && currentPosition.x <= _gameManager.GetLanePosition(CurrentLane).x + tolerance)
+                if (_gameManager.GetLaneStartPosition(CurrentLane).x - tolerance <= currentPosition.x && currentPosition.x <= _gameManager.GetLaneStartPosition(CurrentLane).x + tolerance)
                 {
                     CurrentState = PlayerState.Idle;
                     DestinationLane = CurrentLane;
@@ -135,8 +136,17 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.layer == 7)
         {
-            Collided.Invoke(other);
-            CurrentState = PlayerState.Returning;
+            if (CurrentState == PlayerState.Dashing)
+            {
+                _gameManager.SetTimeScale(0f, 0.12f);
+                CurrentState = PlayerState.Returning;
+                Collided.Invoke(other);
+            }
+            else if (CurrentState == PlayerState.Idle)
+            {
+                print("PLAYER WAS HIT");
+                UtilsClass.ShakeCamera(0.2f, 0.2f);
+            }
         }
     }
 
@@ -145,19 +155,19 @@ public class Player : MonoBehaviour
         var lanePositionTolerance = _playerData.LaneSnappingTolerance;
         var currentPosition = transform.position;
         
-        if (_gameManager.LeftLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.LeftLaneStartPoint.x + lanePositionTolerance)
+        if (_gameManager.LeftLaneStartPosition.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.LeftLaneStartPosition.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Left;
             CurrentState = PlayerState.Idle;
             DestinationLane = CurrentLane;
         }
-        else if (_gameManager.MiddleLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.MiddleLaneStartPoint.x + lanePositionTolerance)
+        else if (_gameManager.MiddleLaneStartPosition.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.MiddleLaneStartPosition.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Middle;
             CurrentState = PlayerState.Idle;
             DestinationLane = CurrentLane;
         }
-        else if (_gameManager.RightLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.RightLaneStartPoint.x + lanePositionTolerance)
+        else if (_gameManager.RightLaneStartPosition.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.RightLaneStartPosition.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Right;
             CurrentState = PlayerState.Idle;

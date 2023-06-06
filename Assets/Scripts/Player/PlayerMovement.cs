@@ -1,4 +1,6 @@
+using System.Threading;
 using UnityEngine;
+using Branda.Utils;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _currentPosition;
     private Vector3 _forwardMovementVector;
     private Vector3 _lateralMovementVector;
+    private float _shipRotation = 0f;
 
     private void Start()
     {
@@ -42,6 +45,15 @@ public class PlayerMovement : MonoBehaviour
         MoveLateral();
 
         transform.position = _currentPosition + _forwardMovementVector + _lateralMovementVector;
+
+        if (_player.CurrentState == PlayerState.Dashing)
+        {
+            Spin();
+        }
+        else
+        {
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     private void MoveForward()
@@ -72,14 +84,22 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 GetTargetPositionForLane(Lane lane)
     {
         if (lane == Lane.Left)
-            return _gameManager.LeftLaneStartPoint;
+            return _gameManager.LeftLaneStartPosition;
         else if (lane == Lane.Middle)
-            return _gameManager.MiddleLaneStartPoint;
+            return _gameManager.MiddleLaneStartPosition;
         else if (lane == Lane.Right)
-            return _gameManager.RightLaneStartPoint;
+            return _gameManager.RightLaneStartPosition;
 
         // Default to current position if lane is unknown
         return _currentPosition;
+    }
+
+    private void Spin()
+    {
+        float rotationSpeed = 5000f;
+
+        _shipRotation = (_shipRotation + (rotationSpeed * Time.deltaTime)) % 360f;
+        transform.rotation = Quaternion.Euler(0, 0, -_shipRotation);
     }
 
     private void UpdateCurrentPosition()
