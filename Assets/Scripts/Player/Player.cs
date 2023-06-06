@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
@@ -8,14 +9,17 @@ public class Player : MonoBehaviour
     private static Player instance;
     public static Player Instance { get { return instance; } }
     
+    public CollisionEvent Collided;
+    [System.Serializable] public class CollisionEvent : UnityEvent<Collider> { }
+
     [SerializeField] private Transform planeModelTransform;
 
     private GameManager _gameManager;
     private PlayerData _playerData;
-    private PlayerMovement2 _movement;
+    private PlayerMovement _movement;
     private PlayerMesh _playerMesh;
     public Lane CurrentLane { get; private set; } = Lane.Middle;
-    private Lane _destinationLane;
+    public Lane DestinationLane  { get; private set; } = Lane.Middle;
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
     private InputDirection _inputDirection;
 
@@ -66,9 +70,7 @@ public class Player : MonoBehaviour
                         CurrentState = PlayerState.Dashing;
                         
                         var targetLaneIndex = (int)CurrentLane - 1;
-                        _destinationLane = (Lane)targetLaneIndex;
-                        
-                        Dash();
+                        DestinationLane = (Lane)targetLaneIndex;
                     }
                 }
                 else if (_inputDirection == InputDirection.Right)
@@ -78,22 +80,28 @@ public class Player : MonoBehaviour
                         CurrentState = PlayerState.Dashing;
                         
                         var targetLaneIndex = (int)CurrentLane + 1;
-                        _destinationLane = (Lane)targetLaneIndex;
-                        
-                        Dash();
+                        DestinationLane = (Lane)targetLaneIndex;
                     }
                 }
                 else if (_inputDirection == InputDirection.None) { }
                 break;
             
             case PlayerState.Dashing:
-                if (CurrentLane == _destinationLane)
+                if (CurrentLane == DestinationLane)
                 {
                     CurrentState = PlayerState.Idle;
                 }
                 break;
             
             case PlayerState.Returning:
+                var tolerance = _playerData.LaneSnappingTolerance;
+                var currentPosition = transform.position;
+                
+                if (_gameManager.GetLanePosition(CurrentLane).x - tolerance <= currentPosition.x && currentPosition.x <= _gameManager.GetLanePosition(CurrentLane).x + tolerance)
+                {
+                    CurrentState = PlayerState.Idle;
+                    DestinationLane = CurrentLane;
+                }
                 break;
             
             case PlayerState.Hit:
@@ -120,19 +128,18 @@ public class Player : MonoBehaviour
         // ------Singletons------
         _playerData = PlayerData.Instance;
         _gameManager = GameManager.Instance;
-        _movement = gameObject.GetComponent<PlayerMovement2>();
+        _movement = gameObject.GetComponent<PlayerMovement>();
     }
 
     private void PlayerMeshOnCollision(Collider other)
     {
-        // Debug.Log("Collision Event triggered by " + other.gameObject.name);
+        if (other.gameObject.layer == 7)
+        {
+            Collided.Invoke(other);
+            CurrentState = PlayerState.Returning;
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        print(collision.gameObject.name);
-    }
-    
     private void UpdateCurrentLane()
     {
         var lanePositionTolerance = _playerData.LaneSnappingTolerance;
@@ -141,24 +148,25 @@ public class Player : MonoBehaviour
         if (_gameManager.LeftLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.LeftLaneStartPoint.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Left;
+            CurrentState = PlayerState.Idle;
+            DestinationLane = CurrentLane;
         }
         else if (_gameManager.MiddleLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.MiddleLaneStartPoint.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Middle;
+            CurrentState = PlayerState.Idle;
+            DestinationLane = CurrentLane;
         }
         else if (_gameManager.RightLaneStartPoint.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.RightLaneStartPoint.x + lanePositionTolerance)
         {
             CurrentLane = Lane.Right;
+            CurrentState = PlayerState.Idle;
+            DestinationLane = CurrentLane;
         }
     }
 
     public Vector3 GetPlayerPosition()
     {
         return transform.position;
-    }
-
-    private void Dash()
-    {
-        _movement.SetDestinationLane(_destinationLane);
     }
 }

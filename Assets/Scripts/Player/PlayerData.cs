@@ -11,7 +11,6 @@ public class PlayerData : MonoBehaviour
     [field: SerializeField] public float RotationSpeed { get; private set; } = 0.5f;
     [field: SerializeField] public float RotationMaxAngle { get; private set; } = 30f;
     [field: SerializeField] public float RollbackSpeed { get; private set; } = 10f;
-    [field: SerializeField] public float RotationTime { get; private set; }= 0.65f;
     [field: SerializeField] public float LaneSnappingTolerance { get; private set; } = 0.1f;
     
     // An alternative to the syntax above.

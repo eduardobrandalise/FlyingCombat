@@ -43,4 +43,15 @@ public class GameManager : MonoBehaviour
         RightLaneStartPoint = MiddleLaneStartPoint + new Vector3(DistanceBetweenLanes, 0, 0);
         RightLaneEndPoint = RightLaneStartPoint + new Vector3(0, 0, laneLenght);
     }
+
+    public Vector3 GetLanePosition(Lane lane)
+    {
+        return lane switch
+        {
+            Lane.Left => LeftLaneStartPoint,
+            Lane.Middle => MiddleLaneStartPoint,
+            Lane.Right => RightLaneStartPoint,
+            _ => MiddleLaneStartPoint
+        };
+    }
 }
