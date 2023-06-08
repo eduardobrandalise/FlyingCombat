@@ -596,7 +596,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1408
+  m_Name: pb_Mesh-324858
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -1624,6 +1624,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_VersionIndex
       value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 4394874773695058891, guid: f6bd71374bddd484a89f278268cfe7bc,
+        type: 3}
+      propertyPath: <LateralSpeed>k__BackingField
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 4394874773695058891, guid: f6bd71374bddd484a89f278268cfe7bc,
+        type: 3}
+      propertyPath: <RotationSpeed>k__BackingField
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 4414370282631262113, guid: f6bd71374bddd484a89f278268cfe7bc,
         type: 3}

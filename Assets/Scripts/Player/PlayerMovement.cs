@@ -96,10 +96,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Spin()
     {
-        float rotationSpeed = 5000f;
-
-        _shipRotation = (_shipRotation + (rotationSpeed * Time.deltaTime)) % 360f;
-        transform.rotation = Quaternion.Euler(0, 0, -_shipRotation);
+        _shipRotation = (_shipRotation + (_playerData.RotationSpeed * Time.deltaTime)) % 360f;
+        var rotationDirection = _player.GetPlayerPosition().x < _gameManager.GetLaneStartPosition(_player.DestinationLane).x
+            ? -_shipRotation : _shipRotation;
+        transform.rotation = Quaternion.Euler(0, 0, rotationDirection);
     }
 
     private void UpdateCurrentPosition()
