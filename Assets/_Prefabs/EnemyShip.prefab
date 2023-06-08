@@ -6763,4 +6763,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyModel: {fileID: 2411193114668207884}
   deathParticleSystem: {fileID: 2211206295353421423}
-  movementSpeed: 60
+  movementSpeed: 30

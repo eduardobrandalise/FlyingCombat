@@ -34,7 +34,6 @@ public class Enemy : MonoBehaviour
     {
         Move();
         DestroyWhenOutsideScreen();
-        
     }
 
     private void Move()

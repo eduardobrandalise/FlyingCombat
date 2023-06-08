@@ -1,5 +1,6 @@
 using System;
 using Branda.Utils;
+using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -19,6 +20,7 @@ public class Player : MonoBehaviour
     private PlayerData _playerData;
     private PlayerMovement _movement;
     private PlayerMesh _playerMesh;
+    private CinemachineImpulseSource _impulseSource;
     public Lane CurrentLane { get; private set; } = Lane.Middle;
     public Lane DestinationLane  { get; private set; } = Lane.Middle;
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
@@ -145,7 +147,18 @@ public class Player : MonoBehaviour
             else if (CurrentState == PlayerState.Idle)
             {
                 print("PLAYER WAS HIT");
-                UtilsClass.ShakeCamera(0.2f, 0.2f);
+                _impulseSource = GetComponent<CinemachineImpulseSource>();
+                _impulseSource.GenerateImpulse();
+                // CinemachineImpulseDefinition cinemachineImpulseDefinition = new CinemachineImpulseDefinition
+                // {
+                //     m_ImpulseShape = CinemachineImpulseDefinition.ImpulseShapes.Rumble,
+                //     // m_ImpulseDuration = 0.5f,
+                //     // m_PropagationSpeed = 800f
+                // };
+                //
+                // _impulseSource.m_ImpulseDefinition = cinemachineImpulseDefinition;
+                // _impulseSource.GenerateImpulse();
+                // UtilsClass.ShakeCamera(0.2f, 0.2f);
             }
         }
     }
