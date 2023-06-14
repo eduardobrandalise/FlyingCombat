@@ -1,6 +1,4 @@
-using System.Threading;
 using UnityEngine;
-using Branda.Utils;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -97,7 +95,7 @@ public class PlayerMovement : MonoBehaviour
     private void Spin()
     {
         _shipRotation = (_shipRotation + (_playerData.RotationSpeed * Time.deltaTime)) % 360f;
-        var rotationDirection = _player.GetPlayerPosition().x < _gameManager.GetLaneStartPosition(_player.DestinationLane).x
+        var rotationDirection = _player.Position.x < _gameManager.GetLaneStartPosition(_player.DestinationLane).x
             ? -_shipRotation : _shipRotation;
         transform.rotation = Quaternion.Euler(0, 0, rotationDirection);
     }

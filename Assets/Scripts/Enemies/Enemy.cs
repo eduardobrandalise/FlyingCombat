@@ -1,20 +1,24 @@
-using Unity.VisualScripting.Dependencies.Sqlite;
+using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Events;
 
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private GameObject enemyModel;
     [SerializeField] private ParticleSystem deathParticleSystem;
     [SerializeField] private float movementSpeed = 80f;
-    
+
     private Player _player;
-    private Camera _mainCamera;
+    private Camera _camera;
+    private SoundManager _soundManager;
+    private GameManager _gameManager;
 
     private void Start()
     {
         _player = Player.Instance;
-        _mainCamera = Camera.main;
+        _gameManager = GameManager.Instance;
+        _camera = Camera.main;
+        _soundManager = SoundManager.Instance;
 
         _player.Collided.AddListener(CheckCollision);
     }
@@ -24,11 +28,11 @@ public class Enemy : MonoBehaviour
         if (colliderObject.gameObject == enemyModel.gameObject) Die();
     }
 
-    private void LateUpdate()
-    {
-        // PositionNextToPlayer();
-        // PositionInFrontOfPlayer();
-    }
+    // private void LateUpdate()
+    // {
+    //     PositionNextToPlayer();
+    //     PositionInFrontOfPlayer();
+    // }
 
     private void FixedUpdate()
     {
@@ -44,15 +48,19 @@ public class Enemy : MonoBehaviour
 
     private void DestroyWhenOutsideScreen()
     {
-        if (IsBehindCamera()) { Destroy(gameObject); }
+        if (IsBehindCamera())
+        {
+            Destroy(gameObject);
+        }
     }
-    
+
     private bool IsBehindCamera()
     {
         float selfZ = transform.position.z;
-        float cameraZ = _mainCamera.transform.position.z;
-
-        return selfZ < cameraZ;
+        float cameraZ = _camera.transform.position.z;
+        float offset = 50f;
+        
+        return selfZ + offset < cameraZ;
     }
 
     private void Die()
@@ -61,20 +69,21 @@ public class Enemy : MonoBehaviour
 
         float yRotation = 0f;
 
-        yRotation = _player.GetPlayerPosition().x < transform.position.x ? 90f : -90f;
+        yRotation = _player.Position.x < transform.position.x ? 45f : -45f;
 
         var currentRotation = transform.rotation;
         Vector3 rotationAngle = new Vector3(currentRotation.x, yRotation, currentRotation.z);
-        
+
         deathParticleSystem.gameObject.transform.rotation = Quaternion.Euler(rotationAngle);
         deathParticleSystem.Play();
-        // Destroy(gameObject);
+
+        _soundManager.PlayExplosionSound(transform.position);
     }
 
     private void PositionInFrontOfPlayer()
     {
         var currentPosition = transform.position;
-        var newPosition = new Vector3(_player.GetPlayerPosition().x, _player.GetPlayerPosition().y, _player.GetPlayerPosition().z + 50);
+        var newPosition = new Vector3(_player.Position.x, _player.Position.y, _player.Position.z + 50);
 
         transform.position = newPosition;
     }
@@ -82,7 +91,7 @@ public class Enemy : MonoBehaviour
     private void PositionNextToPlayer()
     {
         var currentPosition = transform.position;
-        var newPosition = new Vector3(currentPosition.x, currentPosition.y, _player.GetPlayerPosition().z);
+        var newPosition = new Vector3(currentPosition.x, currentPosition.y, _player.Position.z);
 
         transform.position = newPosition;
     }

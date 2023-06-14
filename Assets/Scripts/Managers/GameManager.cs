@@ -38,16 +38,18 @@ public class GameManager : MonoBehaviour
     private void SetupLanePositions()
     {
         // MiddleLaneStartPoint = Player.Instance.GetPlayerPosition();
-        MiddleLaneStartPosition = new Vector3(Player.Instance.GetPlayerPosition().x, Player.Instance.GetPlayerPosition().y, 0);
+        MiddleLaneStartPosition = new Vector3(Player.Instance.Position.x, Player.Instance.Position.y, 0);
         MiddleLaneEndPosition = MiddleLaneStartPosition + new Vector3(0, 0, laneLenght);
         LeftLaneStartPosition = MiddleLaneStartPosition - new Vector3(DistanceBetweenLanes, 0, 0);
         LeftLaneEndPosition = LeftLaneStartPosition + new Vector3(0, 0, laneLenght);
         RightLaneStartPosition = MiddleLaneStartPosition + new Vector3(DistanceBetweenLanes, 0, 0);
         RightLaneEndPosition = RightLaneStartPosition + new Vector3(0, 0, laneLenght);
     }
-
+    
     public Vector3 GetLaneStartPosition(Lane lane)
     {
+        var dic = new Dictionary<string, string>();
+        
         return lane switch
         {
             Lane.Left => LeftLaneStartPosition,
@@ -71,10 +73,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(PauseCoroutine(duration, timeScale));
+        StartCoroutine(SlowTimeCoroutine(duration, timeScale));
     }
     
-    private IEnumerator PauseCoroutine(float duration, float timeScale)
+    private IEnumerator SlowTimeCoroutine(float duration, float timeScale)
     {
         _isGamePaused = true;
         Time.timeScale = timeScale; // Set the time scale to 0 to pause the game

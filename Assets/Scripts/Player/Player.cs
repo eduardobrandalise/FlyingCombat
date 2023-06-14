@@ -18,12 +18,15 @@ public class Player : MonoBehaviour
 
     private GameManager _gameManager;
     private PlayerData _playerData;
+    private SoundManager _soundManager;
     private PlayerMovement _movement;
     private PlayerMesh _playerMesh;
     private CinemachineImpulseSource _impulseSource;
     public Lane CurrentLane { get; private set; } = Lane.Middle;
     public Lane DestinationLane  { get; private set; } = Lane.Middle;
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
+    public Vector3 Position => GetPosition();
+    
     private InputDirection _inputDirection;
 
     private void Awake()
@@ -131,6 +134,8 @@ public class Player : MonoBehaviour
         // ------Singletons------
         _playerData = PlayerData.Instance;
         _gameManager = GameManager.Instance;
+        _soundManager = SoundManager.Instance;
+        
         _movement = gameObject.GetComponent<PlayerMovement>();
     }
 
@@ -140,15 +145,17 @@ public class Player : MonoBehaviour
         {
             if (CurrentState == PlayerState.Dashing)
             {
-                _gameManager.SetTimeScale(0f, 0.12f);
                 CurrentState = PlayerState.Returning;
                 Collided.Invoke(other);
+                _gameManager.SetTimeScale(0f, 0.12f);
             }
             else if (CurrentState == PlayerState.Idle)
             {
                 print("PLAYER WAS HIT");
                 _impulseSource = GetComponent<CinemachineImpulseSource>();
                 _impulseSource.GenerateImpulse();
+                _soundManager.PlayHitSound(GetPosition());
+                
                 // CinemachineImpulseDefinition cinemachineImpulseDefinition = new CinemachineImpulseDefinition
                 // {
                 //     m_ImpulseShape = CinemachineImpulseDefinition.ImpulseShapes.Rumble,
@@ -188,7 +195,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public Vector3 GetPlayerPosition()
+    private Vector3 GetPosition()
     {
         return transform.position;
     }

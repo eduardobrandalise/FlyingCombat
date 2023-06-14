@@ -36,7 +36,7 @@ public class EnemySpawner : MonoBehaviour
     {
         // var currentPosition = transform.position;
         var newPosition = new Vector3(GameManager.Instance.GetLaneStartPosition(Lane.Middle).x, 
-            _player.GetPlayerPosition().y, _player.GetPlayerPosition().z + distanceFromPlayer);
+            _player.Position.y, _player.Position.z + distanceFromPlayer);
 
         transform.position = newPosition;
     }
