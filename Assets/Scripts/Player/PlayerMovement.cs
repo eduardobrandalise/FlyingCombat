@@ -11,6 +11,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _currentPosition;
     private Vector3 _forwardMovementVector;
     private Vector3 _lateralMovementVector;
+    private float _speedIncreaseRate = 5f;
+    private float _currentForwardSpeed;
     private float _shipRotation = 0f;
 
     private void Start()
@@ -21,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
+        IncreaseForwardSpeed();
     }
 
     private void InitializeProperties()
@@ -33,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
         _currentPosition = transform.position;
         _forwardMovementVector = Vector3.zero;
         _lateralMovementVector = Vector3.zero;
+        _currentForwardSpeed = _playerData.BaseForwardSpeed;
     }
 
     private void Move()
@@ -56,7 +60,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MoveForward()
     {
-        _forwardMovementVector = Vector3.forward * (_playerData.ForwardSpeed * Time.deltaTime);
+        _forwardMovementVector = Vector3.forward * (_currentForwardSpeed * Time.deltaTime);
     }
 
     private void MoveLateral()
@@ -77,6 +81,11 @@ public class PlayerMovement : MonoBehaviour
             _lateralMovementVector = Vector3.MoveTowards(_currentPosition, targetPosition, _playerData.LateralSpeed * Time.deltaTime) - _currentPosition;
         }
 
+    }
+    
+    private void IncreaseForwardSpeed()
+    {
+        _currentForwardSpeed += _speedIncreaseRate * Time.deltaTime;
     }
 
     private Vector3 GetTargetPositionForLane(Lane lane)

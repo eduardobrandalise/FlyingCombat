@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3841476649982603614}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallPassage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   m_Children:
   - {fileID: 8372395327053241143}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8092105169311329708
 GameObject:
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 4818356947712549562}
   - component: {fileID: 5654222612847768303}
   - component: {fileID: 3328832907861295896}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

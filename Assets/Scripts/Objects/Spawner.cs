@@ -2,20 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
-public class EnemySpawner : MonoBehaviour
+public class Spawner : MonoBehaviour
 {
     [SerializeField] private Transform leftSpawner;
     [SerializeField] private Transform middleSpawner;
     [SerializeField] private Transform rightSpawner;
     [SerializeField] private GameObject enemyShipPrefab;
+    [SerializeField] private WallRefsSO wallRefSo;
     [SerializeField] private float enemySpawningRate = 1f;
+    [SerializeField] private float wallSpawningRate = 3f;
     [SerializeField] private float distanceFromPlayer = 400f;
 
     private Player _player;
-    private float _spawningTimer = 0f;
+    private float _spawningEnemyTimer = 0f;
+    private float _spawningWallTimer = 0f;
 
     private void Start()
     {
@@ -24,7 +26,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void FixedUpdate()
     {
-        ManageEnemySpawning();
+        ManageSpawning();
     }
 
     private void LateUpdate()
@@ -32,29 +34,45 @@ public class EnemySpawner : MonoBehaviour
         Move();
     }
 
+    /// <summary>
+    /// Repositions the Spawner based on the current player's position. It should be called in LateUpdate to take
+    /// movement calculations in consideration.
+    /// </summary>
     private void Move()
     {
         // var currentPosition = transform.position;
-        var newPosition = new Vector3(GameManager.Instance.GetLaneStartPosition(Lane.Middle).x, 
+        var newPosition = new Vector3(GameManager.Instance.GetLaneStartPosition(Lane.Middle).x,
             _player.Position.y, _player.Position.z + distanceFromPlayer);
 
         transform.position = newPosition;
     }
 
-    private void ManageEnemySpawning()
+    private void ManageSpawning()
     {
-        _spawningTimer += Time.deltaTime;
-        
-        if (_spawningTimer > enemySpawningRate)
+        _spawningEnemyTimer += Time.deltaTime;
+        _spawningWallTimer += Time.deltaTime;
+
+        if (_spawningEnemyTimer > enemySpawningRate)
         {
-            SpawnEnemy();
-            _spawningTimer = 0f;
+            // SpawnEnemy();
+            _spawningEnemyTimer = 0f;
+        }
+
+        if (_spawningWallTimer > wallSpawningRate)
+        {
+            SpawnWall();
+            _spawningWallTimer = 0f;
         }
     }
 
     private void SpawnEnemy()
     {
         InstantiateEnemy(PickRandomLane());
+    }
+
+    private void SpawnWall()
+    {
+        InstantiateWall(PickRandomWall());
     }
 
     private void InstantiateEnemy(Lane lane)
@@ -68,17 +86,26 @@ public class EnemySpawner : MonoBehaviour
         };
 
         Instantiate(enemyShipPrefab, spawnerPosition, Quaternion.identity);
-        // GameObject instantiatedObject = GameObject instantiatedObject = Instantiate(enemyShipPrefab, spawnerPosition, Quaternion.identity);
-        // instantiatedObject.transform.position = spawner.transform.position;
-        // Rocket rocketComponent = instantiatedObject.GetComponent<Rocket>();
-        // instantiatedObject.GetComponent<Enemy>().enabled = true;
+    }
+
+    private void InstantiateWall(GameObject wall)
+    {
+        Vector3 spawningPointPosition = middleSpawner.transform.position;
+        Vector3 position = new Vector3(spawningPointPosition.x, 0, spawningPointPosition.z);
+        Instantiate(wall, position, Quaternion.identity);
     }
 
     private Lane PickRandomLane()
     {
         List<Lane> lanes = new List<Lane>(Enum.GetValues(typeof(Lane)).Cast<Lane>());
-        int randomIndex = UnityEngine.Random.Range(0, lanes.Count);
+        int randomIndex = Random.Range(0, lanes.Count);
         Lane randomLane = lanes[randomIndex];
         return randomLane;
+    }
+
+    private GameObject PickRandomWall()
+    {
+        int randomIndex = Random.Range(0, wallRefSo.walls.Count);
+        return wallRefSo.walls[randomIndex];
     }
 }

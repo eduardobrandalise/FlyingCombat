@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8879923181691626260}
   - component: {fileID: 7233731848425460563}
   - component: {fileID: 3943483668964414690}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1293,7 +1293,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9173741553814387587}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Wall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1314,5 +1314,5 @@ Transform:
   m_Children:
   - {fileID: 8077947848096362732}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c38ea5b6a050754f80644940c053d68, type: 3}
+  m_Name: WallRefSO
+  m_EditorClassIdentifier: 
+  walls:
+  - {fileID: 5841110738028535079, guid: 289c2d5a39946e74ab6917ec6a83970c, type: 3}
+  - {fileID: 5841110738028535079, guid: 00af91d6dc641614d90f8cf737f95e6e, type: 3}
+  - {fileID: 5841110738028535079, guid: 00bfd6cb93e469743a9498316788eea5, type: 3}
+  - {fileID: 5841110738028535079, guid: 8644cc8391ff9274cad4e73850e69c97, type: 3}
+  - {fileID: 5841110738028535079, guid: 535f61a66c2b3dc4bb5ca6085dd46e2f, type: 3}
+  - {fileID: 5841110738028535079, guid: 2062ca1d6d38b76459b6ff5aa3f9cd36, type: 3}
+  - {fileID: 5841110738028535079, guid: 63ee57003a8b6044181e23863bd79e1f, type: 3}

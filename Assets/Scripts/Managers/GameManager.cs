@@ -3,12 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Branda.Utils;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager instance;
-    public static GameManager Instance { get { return instance; } }
+    private static GameManager _instance;
+    public static GameManager Instance { get { return _instance; } }
+
+    public UnityEvent gamePaused;
 
     [SerializeField] private Transform enemySpawner;
     [SerializeField] private float laneLenght = 400f;
@@ -26,13 +29,20 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance != null && instance != this) { Destroy(gameObject); }
-        else { instance = this; }
+        if (_instance != null && _instance != this) { Destroy(gameObject); }
+        else { _instance = this; }
     }
 
     private void Start()
     {
+        Player.Instance.died.AddListener(EndSession);
+        
         SetupLanePositions();
+    }
+
+    private void EndSession()
+    {
+        TogglePauseGame();
     }
 
     private void SetupLanePositions()
@@ -57,6 +67,21 @@ public class GameManager : MonoBehaviour
             Lane.Right => RightLaneStartPosition,
             _ => MiddleLaneStartPosition
         };
+    }
+    
+    public void TogglePauseGame() {
+        _isGamePaused = !_isGamePaused;
+        
+        if (_isGamePaused) {
+            Time.timeScale = 0f;
+            
+            gamePaused.Invoke();    
+        }
+        else {
+            Time.timeScale = 1f;
+            
+            gamePaused.Invoke();
+        }
     }
     
     /// <summary>

@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour
         _camera = Camera.main;
         _soundManager = SoundManager.Instance;
 
-        _player.Collided.AddListener(CheckCollision);
+        _player.collided.AddListener(CheckCollision);
     }
 
     private void CheckCollision(Collider colliderObject)

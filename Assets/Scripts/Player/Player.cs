@@ -8,11 +8,13 @@ using UnityEngine.Serialization;
 
 public class Player : MonoBehaviour
 {
-    private static Player instance;
-    public static Player Instance { get { return instance; } }
+    private static Player _instance;
+    public static Player Instance { get { return _instance; } }
     
-    public CollisionEvent Collided;
+    public CollisionEvent collided;
     [System.Serializable] public class CollisionEvent : UnityEvent<Collider> { }
+
+    public UnityEvent died;
 
     [SerializeField] private Transform planeModelTransform;
 
@@ -22,6 +24,7 @@ public class Player : MonoBehaviour
     private PlayerMovement _movement;
     private PlayerMesh _playerMesh;
     private CinemachineImpulseSource _impulseSource;
+    private int _lives = 3;
     public Lane CurrentLane { get; private set; } = Lane.Middle;
     public Lane DestinationLane  { get; private set; } = Lane.Middle;
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
@@ -31,8 +34,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        if (instance != null && instance != this) { Destroy(gameObject); }
-        else { instance = this; }
+        if (_instance != null && _instance != this) { Destroy(gameObject); }
+        else { _instance = this; }
     }
 
     private void Start()
@@ -141,33 +144,38 @@ public class Player : MonoBehaviour
 
     private void PlayerMeshOnCollision(Collider other)
     {
-        if (other.gameObject.layer == 7)
+        if (other.gameObject.layer == (int)Layer.Enemy)
         {
             if (CurrentState == PlayerState.Dashing)
             {
                 CurrentState = PlayerState.Returning;
-                Collided.Invoke(other);
+                collided.Invoke(other);
                 _gameManager.SetTimeScale(0f, 0.12f);
             }
             else if (CurrentState == PlayerState.Idle)
             {
-                print("PLAYER WAS HIT");
+                RemoveLife();
                 _impulseSource = GetComponent<CinemachineImpulseSource>();
                 _impulseSource.GenerateImpulse();
                 _soundManager.PlayHitSound(GetPosition());
-                
-                // CinemachineImpulseDefinition cinemachineImpulseDefinition = new CinemachineImpulseDefinition
-                // {
-                //     m_ImpulseShape = CinemachineImpulseDefinition.ImpulseShapes.Rumble,
-                //     // m_ImpulseDuration = 0.5f,
-                //     // m_PropagationSpeed = 800f
-                // };
-                //
-                // _impulseSource.m_ImpulseDefinition = cinemachineImpulseDefinition;
-                // _impulseSource.GenerateImpulse();
-                // UtilsClass.ShakeCamera(0.2f, 0.2f);
             }
         }
+        else if (other.gameObject.layer == (int)Layer.Obstacle)
+        {
+            RemoveLife();
+            print("Player collided with: " + other.name);
+        }
+    }
+
+    private void RemoveLife()
+    {
+        _lives -= 1;
+        if (_lives <= 0) { Die(); }
+    }
+
+    private void Die()
+    {
+        died.Invoke();
     }
 
     private void UpdateCurrentLane()
@@ -198,5 +206,10 @@ public class Player : MonoBehaviour
     private Vector3 GetPosition()
     {
         return transform.position;
+    }
+
+    private int GetRemainingLives()
+    {
+        return _lives;
     }
 }
