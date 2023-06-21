@@ -3182,12 +3182,8 @@ MonoBehaviour:
   m_VersionIndex: 924
   m_IsSelectable: 1
   m_SelectedFaces: 
-  m_SelectedEdges:
-  - a: 16
-    b: 17
-  - a: 36
-    b: 37
-  m_SelectedVertices: 10000000110000002400000025000000
+  m_SelectedEdges: []
+  m_SelectedVertices: 
 --- !u!23 &3439668568758394053
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3269,6 +3265,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9173741553814387587}
+  - component: {fileID: 6005886221681518741}
   m_Layer: 8
   m_Name: WallPassageLeftCenter
   m_TagString: Untagged
@@ -3292,3 +3289,15 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6005886221681518741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5841110738028535079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccc9123a229f3844098380ca10d7076a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

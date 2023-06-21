@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get { return _instance; } }
 
     public UnityEvent gamePaused;
+    public UnityEvent gameUnpaused;
 
     [SerializeField] private Transform enemySpawner;
     [SerializeField] private float laneLenght = 400f;
@@ -36,8 +37,15 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         Player.Instance.died.AddListener(EndSession);
-        
+        InputManager.Instance.pausePressed.AddListener(TogglePauseGame);
+
         SetupLanePositions();
+    }
+
+    private void OnDestroy()
+    {
+        Player.Instance.died.RemoveListener(EndSession);
+        InputManager.Instance.pausePressed.RemoveListener(TogglePauseGame);
     }
 
     private void EndSession()
@@ -80,16 +88,15 @@ public class GameManager : MonoBehaviour
         else {
             Time.timeScale = 1f;
             
-            gamePaused.Invoke();
+            gameUnpaused.Invoke();
         }
     }
     
     /// <summary>
-    /// Sets the scale at which time passes for the specified duration in seconds.
-    /// The scale goes from 0 (paused) to 1 (normal).
+    /// Sets the scale at which time passes for a specified duration.
     /// </summary>
-    /// <param name="duration"></param>
-    /// <param name="timeScale"></param>
+    /// <param name="duration">Duration in seconds.</param>
+    /// <param name="timeScale">The scale goes from 0 (paused) to 1 (normal).</param>
     public void SetTimeScale(float timeScale, float duration)
     {
         if (_isGamePaused)
