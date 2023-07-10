@@ -109,6 +109,11 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, rotationDirection);
     }
 
+    public void ResetSpeed()
+    {
+        _currentForwardSpeed = _playerData.BaseForwardSpeed;
+    }
+    
     private void UpdateCurrentPosition()
     {
         _currentPosition = transform.position;

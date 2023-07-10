@@ -54,13 +54,13 @@ public class Spawner : MonoBehaviour
 
         if (_spawningEnemyTimer > enemySpawningRate)
         {
-            // SpawnEnemy();
+            SpawnEnemy();
             _spawningEnemyTimer = 0f;
         }
 
         if (_spawningWallTimer > wallSpawningRate)
         {
-            SpawnWall();
+            // SpawnWall();
             _spawningWallTimer = 0f;
         }
     }

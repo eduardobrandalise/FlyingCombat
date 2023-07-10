@@ -2,18 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Branda.Utils;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public enum State
+    {
+        GamePlaying,
+        GameOver,
+    }
+    
     private static GameManager _instance;
     public static GameManager Instance { get { return _instance; } }
 
     public UnityEvent gamePaused;
     public UnityEvent gameUnpaused;
-
+    public GameStateChangedEvent gameStateChanged;
+    [Serializable] public class GameStateChangedEvent : UnityEvent<State> { }
+    
     [SerializeField] private Transform enemySpawner;
     [SerializeField] private float laneLenght = 400f;
     [SerializeField] public float DistanceBetweenLanes { get; private set; } = 10f;
@@ -25,8 +32,8 @@ public class GameManager : MonoBehaviour
     public Vector3 RightLaneStartPosition { get; private set; }
     public Vector3 RightLaneEndPosition { get; private set; }
 
+    private State _currentGameState;
     private bool _isGamePaused = false;
-
 
     private void Awake()
     {
@@ -34,12 +41,25 @@ public class GameManager : MonoBehaviour
         else { _instance = this; }
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (_isGamePaused) { TogglePauseGame(); }
+    }
+
     private void Start()
     {
         Player.Instance.died.AddListener(EndSession);
         InputManager.Instance.pausePressed.AddListener(TogglePauseGame);
 
+        gameStateChanged ??= new GameStateChangedEvent();
+        
         SetupLanePositions();
+        ChangeGameStatusTo(State.GamePlaying);
     }
 
     private void OnDestroy()
@@ -50,6 +70,7 @@ public class GameManager : MonoBehaviour
 
     private void EndSession()
     {
+        ChangeGameStatusTo(State.GameOver);
         TogglePauseGame();
     }
 
@@ -76,6 +97,12 @@ public class GameManager : MonoBehaviour
             _ => MiddleLaneStartPosition
         };
     }
+
+    private void ChangeGameStatusTo(State state)
+    {
+        _currentGameState = state;
+        gameStateChanged.Invoke(_currentGameState);
+    }
     
     public void TogglePauseGame() {
         _isGamePaused = !_isGamePaused;
@@ -83,7 +110,7 @@ public class GameManager : MonoBehaviour
         if (_isGamePaused) {
             Time.timeScale = 0f;
             
-            gamePaused.Invoke();    
+            gamePaused.Invoke();
         }
         else {
             Time.timeScale = 1f;
@@ -97,7 +124,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     /// <param name="duration">Duration in seconds.</param>
     /// <param name="timeScale">The scale goes from 0 (paused) to 1 (normal).</param>
-    public void SetTimeScale(float timeScale, float duration)
+    public void SetTimeScaleWithDuration(float timeScale, float duration)
     {
         if (_isGamePaused)
         {
@@ -117,5 +144,10 @@ public class GameManager : MonoBehaviour
 
         Time.timeScale = 1f; // Set the time scale back to 1 to resume the game
         _isGamePaused = false;
+    }
+
+    public State GetCurrentState()
+    {
+        return _currentGameState;
     }
 }

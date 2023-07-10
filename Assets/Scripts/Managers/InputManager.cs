@@ -13,23 +13,23 @@ public class InputManager : MonoBehaviour
 
     public UnityEvent pausePressed;
     
-    private PlayerInputActions playerInputActions;
+    private PlayerInputActions _playerInputActions;
 
     private void Awake()
     {
         if (instance != null && instance != this) { Destroy(this.gameObject); }
         else { instance = this; }
         
-        playerInputActions = new PlayerInputActions();
+        _playerInputActions = new PlayerInputActions();
         
         EnableLateralInput();
         
-        playerInputActions.Player.Pause.performed += PauseOnPerformed;
+        _playerInputActions.Player.Pause.performed += PauseOnPerformed;
     }
 
     private void OnDestroy()
     {
-        playerInputActions.Player.Pause.performed -= PauseOnPerformed;
+        _playerInputActions.Player.Pause.performed -= PauseOnPerformed;
     }
 
     private void PauseOnPerformed(InputAction.CallbackContext obj)
@@ -39,7 +39,7 @@ public class InputManager : MonoBehaviour
 
     public float GetLateralMovementNormalized()
     {
-        Vector2 inputVector = playerInputActions.Player.Move.ReadValue<Vector2>();
+        Vector2 inputVector = _playerInputActions.Player.Move.ReadValue<Vector2>();
         inputVector = inputVector.normalized;
 
         float xInputVector = inputVector.x;
@@ -48,6 +48,6 @@ public class InputManager : MonoBehaviour
 
     private void EnableLateralInput()
     {
-        playerInputActions.Player.Enable();
+        _playerInputActions.Player.Enable();
     }
 }

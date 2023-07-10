@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     public static Player Instance { get { return _instance; } }
     
     public CollisionEvent collided;
-    [System.Serializable] public class CollisionEvent : UnityEvent<Collider> { }
+    [Serializable] public class CollisionEvent : UnityEvent<Collider> { }
 
     public UnityEvent died;
 
@@ -54,6 +54,19 @@ public class Player : MonoBehaviour
     {
         HandleInput();
         ManageState();
+    }
+
+    public void ResetPlayer()
+    {
+        ShowPlaneModel();
+        ResetPosition();
+        _movement.ResetSpeed();
+        CurrentState = PlayerState.Idle;
+    }
+
+    private void ResetPosition()
+    {
+        transform.position = new Vector3(0, GetPosition().y, 0);
     }
 
     private void HandleInput()
@@ -112,11 +125,9 @@ public class Player : MonoBehaviour
                     DestinationLane = CurrentLane;
                 }
                 break;
-            
-            case PlayerState.Hit:
-                break;
-            
+
             case PlayerState.Destroyed:
+                Die();
                 break;
             
             default:
@@ -150,31 +161,25 @@ public class Player : MonoBehaviour
             {
                 CurrentState = PlayerState.Returning;
                 collided.Invoke(other);
-                _gameManager.SetTimeScale(0f, 0.12f);
+                _gameManager.SetTimeScaleWithDuration(0f, 0.12f);
             }
             else if (CurrentState == PlayerState.Idle)
             {
-                RemoveLife();
                 _impulseSource = GetComponent<CinemachineImpulseSource>();
                 _impulseSource.GenerateImpulse();
                 _soundManager.PlayHitSound(GetPosition());
+                Die();
             }
         }
         else if (other.gameObject.layer == (int)Layer.Obstacle)
         {
-            RemoveLife();
-            print("Player collided with: " + other.name);
+            Die();
         }
-    }
-
-    private void RemoveLife()
-    {
-        _lives -= 1;
-        if (_lives <= 0) { Die(); }
     }
 
     private void Die()
     {
+        HidePlaneModel();
         died.Invoke();
     }
 
@@ -202,6 +207,10 @@ public class Player : MonoBehaviour
             DestinationLane = CurrentLane;
         }
     }
+    
+    private void ShowPlaneModel() { planeModelTransform.gameObject.SetActive(true); }
+    
+    private void HidePlaneModel() { planeModelTransform.gameObject.SetActive(false); }
 
     private Vector3 GetPosition()
     {
