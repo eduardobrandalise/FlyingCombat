@@ -19,9 +19,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform planeModelTransform;
 
     private GameManager _gameManager;
-    private PlayerData _playerData;
     private SoundManager _soundManager;
-    private PlayerMovement _movement;
     private PlayerMesh _playerMesh;
     private CinemachineImpulseSource _impulseSource;
     private int _lives = 3;
@@ -29,6 +27,7 @@ public class Player : MonoBehaviour
     public Lane DestinationLane  { get; private set; } = Lane.Middle;
     public PlayerState CurrentState { get; private set; } = PlayerState.Idle;
     public Vector3 Position => GetPosition();
+    public PlayerData Data { get; private set; }
     
     private InputDirection _inputDirection;
 
@@ -40,14 +39,12 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        _playerMesh = planeModelTransform.GetComponent<PlayerMesh>();
-
+        InitializeProperties();
+        
         if (_playerMesh != null)
         {
             _playerMesh.collided.AddListener(PlayerMeshOnCollision);
         }
-        
-        InitializeProperties();
     }
 
     private void Update()
@@ -56,11 +53,30 @@ public class Player : MonoBehaviour
         ManageState();
     }
 
+    private void OnDestroy()
+    {
+        if (_playerMesh != null)
+        {
+            _playerMesh.collided.RemoveListener(PlayerMeshOnCollision);
+        }
+    }
+
+    private void InitializeProperties()
+    {
+        // ------Singletons------
+        _gameManager = GameManager.Instance;
+        _soundManager = SoundManager.Instance;
+        
+        // ------Dependencies------
+        _playerMesh = planeModelTransform.GetComponent<PlayerMesh>();
+        Data = GetComponent<PlayerData>();
+    }
+
     public void ResetPlayer()
     {
         ShowPlaneModel();
         ResetPosition();
-        _movement.ResetSpeed();
+        Data.ResetSpeed();
         CurrentState = PlayerState.Idle;
     }
 
@@ -116,7 +132,7 @@ public class Player : MonoBehaviour
                 break;
             
             case PlayerState.Returning:
-                var tolerance = _playerData.LaneSnappingTolerance;
+                var tolerance = Data.LaneSnappingTolerance;
                 var currentPosition = transform.position;
                 
                 if (_gameManager.GetLaneStartPosition(CurrentLane).x - tolerance <= currentPosition.x && currentPosition.x <= _gameManager.GetLaneStartPosition(CurrentLane).x + tolerance)
@@ -133,24 +149,6 @@ public class Player : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    private void OnDestroy()
-    {
-        if (_playerMesh != null)
-        {
-            _playerMesh.collided.RemoveListener(PlayerMeshOnCollision);
-        }
-    }
-
-    private void InitializeProperties()
-    {
-        // ------Singletons------
-        _playerData = PlayerData.Instance;
-        _gameManager = GameManager.Instance;
-        _soundManager = SoundManager.Instance;
-        
-        _movement = gameObject.GetComponent<PlayerMovement>();
     }
 
     private void PlayerMeshOnCollision(Collider other)
@@ -185,7 +183,7 @@ public class Player : MonoBehaviour
 
     private void UpdateCurrentLane()
     {
-        var lanePositionTolerance = _playerData.LaneSnappingTolerance;
+        var lanePositionTolerance = Data.LaneSnappingTolerance;
         var currentPosition = transform.position;
         
         if (_gameManager.LeftLaneStartPosition.x - lanePositionTolerance <= currentPosition.x && currentPosition.x <= _gameManager.LeftLaneStartPosition.x + lanePositionTolerance)

@@ -12,6 +12,23 @@ namespace Branda.Utils
     /*
      * Various assorted utilities functions
      * */
+    
+    public static class RandomUtility
+    {
+        public static T ChooseRandomItemFromArray<T>(T[] array)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, array.Length);
+            T randomItem = array[randomIndex];
+            return randomItem;
+        }
+
+        public static T ChooseRandomItemFromEnum<T>()
+        {
+            T[] values = (T[])System.Enum.GetValues(typeof(T));
+            return ChooseRandomItemFromArray(values);
+        }
+    }
+    
     public static class UtilsClass
     {
         private static readonly Vector3 Vector3zero = Vector3.zero;

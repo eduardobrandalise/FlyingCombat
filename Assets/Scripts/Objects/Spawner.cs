@@ -1,18 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Branda.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
+    enum Spawnable
+    {
+        Enemy,
+        Wall
+    }
+    
     [SerializeField] private Transform leftSpawner;
     [SerializeField] private Transform middleSpawner;
     [SerializeField] private Transform rightSpawner;
     [SerializeField] private GameObject enemyShipPrefab;
     [SerializeField] private WallRefsSO wallRefSo;
     [SerializeField] private float enemySpawningRate = 1f;
-    [SerializeField] private float wallSpawningRate = 3f;
+    [SerializeField] private float wallSpawningRate = 1f;
     [SerializeField] private float distanceFromPlayer = 400f;
 
     private Player _player;
@@ -22,6 +29,8 @@ public class Spawner : MonoBehaviour
     private void Start()
     {
         _player = Player.Instance;
+        
+        SpawnEnemy();
     }
 
     private void FixedUpdate()
@@ -31,7 +40,7 @@ public class Spawner : MonoBehaviour
 
     private void LateUpdate()
     {
-        Move();
+        // Move();
     }
 
     /// <summary>
@@ -52,15 +61,22 @@ public class Spawner : MonoBehaviour
         _spawningEnemyTimer += Time.deltaTime;
         _spawningWallTimer += Time.deltaTime;
 
-        if (_spawningEnemyTimer > enemySpawningRate)
+        /// TODO: rethink the spawning logic. Either make the spawning rate universal for all spawnables or manage spawnable rates independently but keeping a universal spawning pace.
+        if (_spawningEnemyTimer > enemySpawningRate || _spawningWallTimer > wallSpawningRate)
         {
-            SpawnEnemy();
-            _spawningEnemyTimer = 0f;
-        }
+            Spawnable spawningObject = RandomUtility.ChooseRandomItemFromEnum<Spawnable>();
 
-        if (_spawningWallTimer > wallSpawningRate)
-        {
-            // SpawnWall();
+            switch (spawningObject)
+            {
+                case Spawnable.Enemy:
+                    SpawnEnemy();
+                    break;
+                case Spawnable.Wall:
+                    // SpawnWall();
+                    break;
+            }
+            
+            _spawningEnemyTimer = 0f;
             _spawningWallTimer = 0f;
         }
     }
