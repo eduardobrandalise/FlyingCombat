@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public UnityEvent gamePaused;
     public UnityEvent gameUnpaused;
     public GameStateChangedEvent gameStateChanged;
+    
     [Serializable] public class GameStateChangedEvent : UnityEvent<State> { }
     
     [SerializeField] private Transform enemySpawner;
